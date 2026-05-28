@@ -104,6 +104,9 @@ const BASELINE_PROJECTS = [
   }
 ];
 
+const AZURE_TABLE_URL = "https://stcruzoneportal.table.core.windows.net/projects";
+const READ_SAS = "?se=2031-05-28T00%3A00%3A00Z&sp=r&spr=https&sv=2019-02-02&tn=projects&sig=GNq0ih2ur3z/1mO6H0ID9DaTSmXzOK2EUJ3gA%2BX1x4k%3D";
+
 export default function App() {
   const [projects, setProjects] = useState([]);
   const [order, setOrder] = useState([]);
@@ -426,6 +429,66 @@ export default function App() {
     return stored ? JSON.parse(stored) : [];
   };
 
+  // Fetch manually added projects from Azure Table Storage
+  const fetchCloudProjects = async () => {
+    try {
+      const res = await fetch(`${AZURE_TABLE_URL}()${READ_SAS}`, {
+        headers: {
+          'Accept': 'application/json;odata=nometadata'
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      return (data.value || []).map(item => ({
+        id: item.RowKey,
+        place: item.place,
+        title: item.title,
+        title2: item.title2,
+        description: item.description,
+        image: item.image,
+        liveUrl: item.liveUrl || null,
+        repoUrl: item.repoUrl || null,
+        isManual: item.isManual
+      }));
+    } catch (err) {
+      console.warn("Could not load projects from Azure Table database, using local cache:", err);
+      return null;
+    }
+  };
+
+  // Configure Write SAS Token
+  const handleConfigureSas = () => {
+    const current = localStorage.getItem('cruz_portal_write_sas') || '';
+    const token = prompt("Enter Azure Write SAS Token (starts with '?se='):\nLeave empty to clear.", current);
+    if (token === null) return;
+    if (!token.trim()) {
+      localStorage.removeItem('cruz_portal_write_sas');
+      alert("Admin SAS Token cleared.");
+    } else {
+      let formatted = token.trim();
+      if (!formatted.startsWith('?')) {
+        formatted = '?' + formatted;
+      }
+      localStorage.setItem('cruz_portal_write_sas', formatted);
+      alert("Admin SAS Token configured successfully!");
+    }
+  };
+
+  // Helper to get Write SAS token with configuration fallback prompt
+  const getWriteSas = () => {
+    let token = localStorage.getItem('cruz_portal_write_sas') || '';
+    if (!token) {
+      const input = prompt("Admin authentication required.\nPlease enter the Azure Write SAS Token:");
+      if (!input) return null;
+      token = input.trim();
+      if (!token.startsWith('?')) {
+        token = '?' + token;
+      }
+      localStorage.setItem('cruz_portal_write_sas', token);
+    }
+    return token;
+  };
+
   // PWA Check Updates
   const checkPwaUpdates = async () => {
     // Register SW
@@ -489,7 +552,15 @@ export default function App() {
       // Hide cover splash screen
       updateLayoutDimensions();
 
-      const manual = loadManual();
+      const cloudManual = await fetchCloudProjects();
+      let manual = [];
+      if (cloudManual !== null) {
+        manual = cloudManual;
+        localStorage.setItem('cruz_portal_manual_projects', JSON.stringify(cloudManual));
+      } else {
+        manual = loadManual();
+      }
+
       const merged = [...manual, ...BASELINE_PROJECTS];
       setProjects(merged);
       setOrder(Array.from({ length: merged.length }, (_, i) => i));
@@ -560,9 +631,12 @@ export default function App() {
   };
 
   // Add project submit
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!pTitle.trim() || !pCategory.trim() || !pDesc.trim()) return;
+
+    const writeSas = getWriteSas();
+    if (!writeSas) return;
 
     let imgVal = coverStyle;
     if (coverStyle === 'custom') {
@@ -573,8 +647,10 @@ export default function App() {
     const title1 = words.slice(0, 2).join(" ") || "PROJECT";
     const title2 = words.slice(2).join(" ") || "DETAILS";
 
-    const newProject = {
-      id: `manual-${Date.now()}`,
+    const projectId = `manual-${Date.now()}`;
+    const newEntity = {
+      PartitionKey: 'project',
+      RowKey: projectId,
       place: pCategory,
       title: title1,
       title2: title2,
@@ -585,41 +661,105 @@ export default function App() {
       isManual: true
     };
 
-    const manual = loadManual();
-    manual.unshift(newProject);
-    localStorage.setItem('cruz_portal_manual_projects', JSON.stringify(manual));
+    try {
+      const res = await fetch(`${AZURE_TABLE_URL}${writeSas}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json;odata=nometadata'
+        },
+        body: JSON.stringify(newEntity)
+      });
 
-    // Update state
-    const newProjects = [newProject, ...projects];
-    setProjects(newProjects);
-    
-    // Close modal & reset form
-    setShowModal(false);
-    setPTitle('');
-    setPCategory('');
-    setPDesc('');
-    setPLive('');
-    setPRepo('');
-    setCoverStyle('gradient-deep-blue');
-    setPCustomImage('');
-    isPausedRef.current = false;
+      if (!res.ok) {
+        if (res.status === 403 || res.status === 401 || res.status === 400) {
+          localStorage.removeItem('cruz_portal_write_sas');
+          alert("Access Denied! The Admin SAS Token is invalid, expired, or has insufficient permissions.");
+          return;
+        }
+        throw new Error(`Azure Table Storage responded with status ${res.status}`);
+      }
 
-    // Reset carousel showing the newly added index 0
-    setOrder(Array.from({ length: newProjects.length }, (_, i) => i));
-    setActiveIdxState(0);
+      // Add to local projects state & update localStorage cache
+      const newProject = {
+        id: projectId,
+        place: pCategory,
+        title: title1,
+        title2: title2,
+        description: pDesc,
+        image: imgVal,
+        liveUrl: pLive.trim() || null,
+        repoUrl: pRepo.trim() || null,
+        isManual: true
+      };
+
+      const manual = loadManual();
+      manual.unshift(newProject);
+      localStorage.setItem('cruz_portal_manual_projects', JSON.stringify(manual));
+
+      const newProjects = [newProject, ...projects];
+      setProjects(newProjects);
+
+      // Close modal & reset form
+      setShowModal(false);
+      setPTitle('');
+      setPCategory('');
+      setPDesc('');
+      setPLive('');
+      setPRepo('');
+      setCoverStyle('gradient-deep-blue');
+      setPCustomImage('');
+      isPausedRef.current = false;
+
+      // Reset carousel showing the newly added index 0
+      setOrder(Array.from({ length: newProjects.length }, (_, i) => i));
+      setActiveIdxState(0);
+      alert("Project successfully added to the Azure Table database!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save project to Azure cloud database: " + err.message);
+    }
   };
 
   // Delete manual project
-  const handleDeleteProject = (projId, title) => {
-    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-      let manual = loadManual();
-      manual = manual.filter(p => p.id !== projId);
-      localStorage.setItem('cruz_portal_manual_projects', JSON.stringify(manual));
+  const handleDeleteProject = async (projId, title) => {
+    if (window.confirm(`Are you sure you want to delete "${title}" from the cloud database?`)) {
+      const writeSas = getWriteSas();
+      if (!writeSas) return;
 
-      const newProjects = projects.filter(p => p.id !== projId);
-      setProjects(newProjects);
-      setOrder(Array.from({ length: newProjects.length }, (_, i) => i));
-      setActiveIdxState(0);
+      try {
+        const deleteUrl = `${AZURE_TABLE_URL}(PartitionKey='project',RowKey='${projId}')${writeSas}`;
+        const res = await fetch(deleteUrl, {
+          method: 'DELETE',
+          headers: {
+            'If-Match': '*',
+            'Accept': 'application/json;odata=nometadata'
+          }
+        });
+
+        if (!res.ok) {
+          if (res.status === 403 || res.status === 401 || res.status === 400) {
+            localStorage.removeItem('cruz_portal_write_sas');
+            alert("Access Denied! The Admin SAS Token is invalid or expired.");
+            return;
+          }
+          throw new Error(`Azure Table Storage responded with status ${res.status}`);
+        }
+
+        // Delete from local projects state & update localStorage cache
+        let manual = loadManual();
+        manual = manual.filter(p => p.id !== projId);
+        localStorage.setItem('cruz_portal_manual_projects', JSON.stringify(manual));
+
+        const newProjects = projects.filter(p => p.id !== projId);
+        setProjects(newProjects);
+        setOrder(Array.from({ length: newProjects.length }, (_, i) => i));
+        setActiveIdxState(0);
+        alert("Project successfully deleted from the Azure Table database!");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete project from Azure cloud database: " + err.message);
+      }
     }
   };
 
@@ -669,6 +809,7 @@ export default function App() {
           <div className="active">Projects</div>
           <a href="https://github.com/ajf013" target="_blank" rel="noopener noreferrer" className="nav-item">GitHub Profile</a>
           <button id="export-json-btn" onClick={handleExportJSON} className="nav-item-btn" title="Export Added Projects to JSON">Export Config</button>
+          <button id="configure-sas-btn" onClick={handleConfigureSas} className="nav-item-btn" title="Configure Azure Write SAS Token">Admin Key</button>
           <button id="theme-toggle-btn" onClick={toggleTheme} className="theme-toggle" title="Toggle Light/Dark Theme">
             {theme === 'dark' ? (
               <svg className="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

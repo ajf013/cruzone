@@ -1353,8 +1353,9 @@ nav .theme-toggle:hover {
   nav .brand-text {
     font-size: 16px;
   }
-  nav .nav-links > .nav-item {
-    display: none; /* Hide profile link on mobile to make room */
+  nav .nav-links > .nav-item,
+  nav .nav-links > .nav-item-btn {
+    display: none; /* Hide profile link and buttons on mobile to make room */
   }
   
   #demo {

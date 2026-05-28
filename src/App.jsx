@@ -12,7 +12,8 @@ const BASELINE_PROJECTS = [
     image: "./projects/ats_analyzer.png",
     liveUrl: "https://atsscore.fcruz.org/",
     repoUrl: "https://github.com/ajf013/ATS-Resume-Score-Checker",
-    isManual: false
+    isManual: false,
+    hasArchitecture: false
   },
   {
     id: "baseline-cloudsentry",
@@ -23,7 +24,8 @@ const BASELINE_PROJECTS = [
     image: "./projects/cloudsentry.png",
     liveUrl: "https://cloudsentry.fcruz.org/",
     repoUrl: "https://github.com/ajf013/CloudSentry",
-    isManual: false
+    isManual: false,
+    hasArchitecture: true
   },
   {
     id: "baseline-finops",
@@ -34,7 +36,8 @@ const BASELINE_PROJECTS = [
     image: "./projects/financial_insights.png",
     liveUrl: "https://finops.fcruz.org/",
     repoUrl: "https://github.com/ajf013/Azure-Financial-Insights",
-    isManual: false
+    isManual: false,
+    hasArchitecture: true
   },
   {
     id: "baseline-cruzops",
@@ -45,7 +48,8 @@ const BASELINE_PROJECTS = [
     image: "./projects/cruzops_ai.png",
     liveUrl: "https://pscli.fcruz.org/",
     repoUrl: "https://github.com/ajf013/CruzOps-AI",
-    isManual: false
+    isManual: false,
+    hasArchitecture: true
   },
   {
     id: "baseline-unicompile",
@@ -56,7 +60,8 @@ const BASELINE_PROJECTS = [
     image: "./projects/unicompile.png",
     liveUrl: "https://unicompile.fcruz.org/",
     repoUrl: "https://github.com/ajf013/UniCompile",
-    isManual: false
+    isManual: false,
+    hasArchitecture: false
   },
   {
     id: "baseline-sticky-notes",
@@ -67,7 +72,8 @@ const BASELINE_PROJECTS = [
     image: "./projects/sticky_notes.png",
     liveUrl: "https://sticky-notes.fcruz.org/",
     repoUrl: "https://github.com/ajf013/sticky-notes-app",
-    isManual: false
+    isManual: false,
+    hasArchitecture: false
   },
   {
     id: "baseline-converter",
@@ -78,7 +84,8 @@ const BASELINE_PROJECTS = [
     image: "./projects/converter_app.png",
     liveUrl: "https://convertme.fcruz.org/",
     repoUrl: "https://github.com/ajf013/converter-app",
-    isManual: false
+    isManual: false,
+    hasArchitecture: false
   },
   {
     id: "baseline-music-player",
@@ -89,7 +96,8 @@ const BASELINE_PROJECTS = [
     image: "./projects/music_player.png",
     liveUrl: "https://music.fcruz.org/",
     repoUrl: "https://github.com/ajf013/musicplayerreact",
-    isManual: false
+    isManual: false,
+    hasArchitecture: false
   },
   {
     id: "baseline-portfolio",
@@ -100,9 +108,488 @@ const BASELINE_PROJECTS = [
     image: "./projects/francis_portfolio.png",
     liveUrl: "https://fcruz.org",
     repoUrl: "https://github.com/ajf013/francis-ajf-portfolio",
-    isManual: false
+    isManual: false,
+    hasArchitecture: false
   }
 ];
+
+const CERTIFICATIONS = [
+  {
+    id: "mct",
+    title: "Microsoft Certified Trainer",
+    subtitle: "MCT (2023 - 2026)",
+    issuer: "Microsoft",
+    date: "Active",
+    badge: "mct",
+    type: "Trainer",
+    desc: "Microsoft's premier technical training credential, verifying pedagogy skills and authorization to deliver official curriculum.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+  },
+  {
+    id: "solutions-architect",
+    title: "Microsoft Certified: Azure Solutions Architect Expert",
+    subtitle: "Expert",
+    issuer: "Microsoft",
+    date: "July 3, 2023",
+    badge: "expert",
+    type: "Expert",
+    desc: "Validates expertise in designing cloud solutions spanning compute, network, storage, governance, and security infrastructures.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+  },
+  {
+    id: "designing-azure-solutions",
+    title: "Microsoft Certified: Designing Azure Infrastructure Solutions",
+    subtitle: "Specialty",
+    issuer: "Microsoft",
+    date: "June 15, 2023",
+    badge: "associate",
+    type: "Specialty",
+    desc: "Validates advanced skills in designing Azure infrastructure solutions, including compute, storage, networking, and security.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+  },
+  {
+    id: "azure-administrator",
+    title: "Microsoft Certified: Azure Administrator Associate",
+    subtitle: "Associate",
+    issuer: "Microsoft",
+    date: "September 16, 2021",
+    badge: "associate",
+    type: "Associate",
+    desc: "Validates skills in implementing, managing, and monitoring identity, governance, storage, compute, and virtual networks in cloud environments.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+  },
+  {
+    id: "azure-security",
+    title: "Microsoft Certified: Azure Security Engineer Associate",
+    subtitle: "Associate",
+    issuer: "Microsoft",
+    date: "November 4, 2022",
+    badge: "associate",
+    type: "Associate",
+    desc: "Validates capabilities in implementing threat protection, managing identity access, and securing networks, data, and applications.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+  },
+  {
+    id: "azure-network",
+    title: "Microsoft Certified: Azure Network Engineer Associate",
+    subtitle: "Associate",
+    issuer: "Microsoft",
+    date: "July 31, 2022",
+    badge: "associate",
+    type: "Associate",
+    desc: "Validates routing and network design capabilities, virtual networking, load balancing, hybrid connections, and network security policies.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+  },
+  {
+    id: "aws-practitioner",
+    title: "AWS Certified Cloud Practitioner",
+    subtitle: "Amazon Web Services",
+    issuer: "Amazon Web Services",
+    date: "February 18, 2022",
+    badge: "aws",
+    type: "AWS",
+    desc: "Validates a high-level understanding of AWS Cloud services, basic security guidelines, compliance, and billing systems.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+  },
+  {
+    id: "azure-fundamentals",
+    title: "Microsoft Certified: Azure Fundamentals",
+    subtitle: "Fundamentals",
+    issuer: "Microsoft",
+    date: "March 24, 2021",
+    badge: "fundamentals",
+    type: "Fundamentals",
+    desc: "Validates foundational knowledge of cloud concepts, core Azure services, management tools, security, governance, and cost tracking.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+  },
+  {
+    id: "azure-data",
+    title: "Microsoft Certified: Azure Data Fundamentals",
+    subtitle: "Fundamentals",
+    issuer: "Microsoft",
+    date: "July 30, 2021",
+    badge: "fundamentals",
+    type: "Fundamentals",
+    desc: "Validates foundational knowledge of core data concepts and how they are implemented using Azure data services.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+  },
+  {
+    id: "azure-ai",
+    title: "Microsoft Certified: Azure AI Fundamentals",
+    subtitle: "Fundamentals",
+    issuer: "Microsoft",
+    date: "March 26, 2021",
+    badge: "fundamentals",
+    type: "Fundamentals",
+    desc: "Validates foundational understanding of machine learning (ML) and artificial intelligence (AI) workloads and their Azure implementations.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+  },
+  {
+    id: "security-fundamentals",
+    title: "Microsoft Certified: Security, Compliance, and Identity Fundamentals",
+    subtitle: "Fundamentals",
+    issuer: "Microsoft",
+    date: "August 12, 2021",
+    badge: "fundamentals",
+    type: "Fundamentals",
+    desc: "Validates baseline knowledge of security, compliance, and identity solutions across Microsoft cloud services.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+  },
+  {
+    id: "power-platform",
+    title: "Microsoft Certified: Power Platform Fundamentals",
+    subtitle: "Fundamentals",
+    issuer: "Microsoft",
+    date: "September 5, 2021",
+    badge: "fundamentals",
+    type: "Fundamentals",
+    desc: "Validates understanding of the business value and product capabilities of Power Platform (Power Apps, Power BI, Automate).",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+  },
+  {
+    id: "m365-fundamentals",
+    title: "Microsoft 365 Certified: Fundamentals",
+    subtitle: "Fundamentals",
+    issuer: "Microsoft",
+    date: "August 17, 2021",
+    badge: "fundamentals",
+    type: "Fundamentals",
+    desc: "Validates foundational understanding of the options available in Microsoft 365, cloud service lifecycles, and security practices.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+  },
+  {
+    id: "ms-challenge",
+    title: "MS Cloud Skills Challenge Champion",
+    subtitle: "Microsoft Americas Team",
+    issuer: "Microsoft",
+    date: "February 21, 2021",
+    badge: "challenge",
+    type: "Champion",
+    desc: "Special recognition from the Microsoft Americas Azure Team for cloud skill mastery challenges.",
+    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+  }
+];
+
+const ARCHITECTURES = {
+  "baseline-cloudsentry": {
+    title: "CloudSentry Architecture",
+    description: "Multi-layered serverless security auditing architecture powered by Azure Functions, Cosmos DB, and Azure OpenAI to scan, store, and analyze cloud vulnerabilities.",
+    nodes: [
+      {
+        id: "client",
+        label: "React Frontend",
+        type: "IaaS",
+        x: 15,
+        y: 50,
+        role: "Hosts the dashboard, displays alerts, cloud node maps, and compliance reports.",
+        terraform: `resource "azurerm_static_web_app" "portal" {
+  name                = "stapp-cloudsentry-prod"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = "eastus2"
+  sku_tier            = "Free"
+}`
+      },
+      {
+        id: "apim",
+        label: "Azure API Management",
+        type: "Network",
+        x: 35,
+        y: 50,
+        role: "Secures external API endpoints, enforces rate-limiting policies, and handles CORS validation.",
+        terraform: `resource "azurerm_api_management" "apim" {
+  name                = "apim-cloudsentry-gateway"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  publisher_name      = "CruzOne"
+  publisher_email     = "admin@fcruz.org"
+  sku_name            = "Consumption_0"
+}`
+      },
+      {
+        id: "keyvault",
+        label: "Azure Key Vault",
+        type: "Security",
+        x: 35,
+        y: 20,
+        role: "Safely stores the subscription scanner credentials, Service Principal keys, and API tokens.",
+        terraform: `resource "azurerm_key_vault" "kv" {
+  name                = "kv-cloudsentry-prod"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  sku_name            = "standard"
+  purge_protection_enabled = false
+}`
+      },
+      {
+        id: "function",
+        label: "Azure Function (Scanner)",
+        type: "Compute",
+        x: 60,
+        y: 50,
+        role: "Triggered on schedules or events. Iterates through subscription configurations to detect compliance drift.",
+        terraform: `resource "azurerm_linux_function_app" "scanner" {
+  name                = "func-cloudsentry-scanner"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  service_plan_id     = azurerm_service_plan.asp.id
+  storage_account_name       = azurerm_storage_account.sa.name
+  storage_account_access_key = azurerm_storage_account.sa.primary_access_key
+  
+  site_config {
+    application_stack {
+      node_version = "18"
+    }
+  }
+}`
+      },
+      {
+        id: "cosmos",
+        label: "Azure Cosmos DB",
+        type: "Database",
+        x: 85,
+        y: 50,
+        role: "Stores raw scan results, historical threat logs, compliance baseline histories, and audit records.",
+        terraform: `resource "azurerm_cosmosdb_account" "db" {
+  name                = "cosmos-cloudsentry-data"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  offer_type          = "Standard"
+  kind                = "GlobalDocumentDB"
+
+  consistency_policy {
+    consistency_level       = "BoundedStaleness"
+    max_interval_in_seconds = 10
+    max_staleness_prefix    = 200
+  }
+
+  geo_location {
+    location          = azurerm_resource_group.rg.location
+    failover_priority = 0
+  }
+}`
+      },
+      {
+        id: "openai",
+        label: "Azure OpenAI Service",
+        type: "AI",
+        x: 60,
+        y: 80,
+        role: "Processes vulnerability descriptions, evaluates impact risk, and generates custom remediation scripts.",
+        terraform: `resource "azurerm_cognitive_account" "openai" {
+  name                = "cog-cloudsentry-openai"
+  location            = "eastus"
+  resource_group_name = azurerm_resource_group.rg.name
+  kind                = "OpenAI"
+  sku_name            = "S0"
+}`
+      }
+    ],
+    connections: [
+      { from: "client", to: "apim" },
+      { from: "apim", to: "function" },
+      { from: "keyvault", to: "function" },
+      { from: "function", to: "cosmos" },
+      { from: "function", to: "openai" }
+    ]
+  },
+  "baseline-finops": {
+    title: "Azure Financial Insights Architecture",
+    description: "FinOps architecture aggregating cost analytics via Microsoft Cost Management APIs, storing logs in serverless Azure Table Storage, and alerting administrators of budget drifts.",
+    nodes: [
+      {
+        id: "client",
+        label: "React Client",
+        type: "IaaS",
+        x: 15,
+        y: 50,
+        role: "Renders spend graphs, optimization cards, and provides budget configuration controls.",
+        terraform: `resource "azurerm_static_web_app" "finops_portal" {
+  name                = "stapp-finops-prod"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = "westeurope"
+  sku_tier            = "Free"
+}`
+      },
+      {
+        id: "costapi",
+        label: "Cost Management API",
+        type: "Network",
+        x: 40,
+        y: 25,
+        role: "Microsoft API querying real-time subscription consumption and resource group invoice data.",
+        terraform: `resource "azurerm_subscription_cost_anomaly_alert" "cost_alert" {
+  name            = "anomaly-detector"
+  subscription_id = "/subscriptions/6556862d-2bee-43e2-bd37-4493ea5c1c70"
+  email_receivers = ["admin@fcruz.org"]
+}`
+      },
+      {
+        id: "tablestorage",
+        label: "Azure Table Storage",
+        type: "Database",
+        x: 40,
+        y: 75,
+        role: "Zero-cost database storing budget thresholds, configured metrics, and historical logs.",
+        terraform: `resource "azurerm_storage_table" "budgets" {
+  name                 = "budgets"
+  storage_account_name = azurerm_storage_account.sa.name
+}`
+      },
+      {
+        id: "alertfunc",
+        label: "Budget Watcher Function",
+        type: "Compute",
+        x: 65,
+        y: 50,
+        role: "Compares current daily spend logs with configured budgets, executing anomaly detection tasks.",
+        terraform: `resource "azurerm_linux_function_app" "budget_watcher" {
+  name                       = "func-finops-budgetwatcher"
+  location                   = azurerm_resource_group.rg.location
+  resource_group_name        = azurerm_resource_group.rg.name
+  service_plan_id            = azurerm_service_plan.asp.id
+  storage_account_name       = azurerm_storage_account.sa.name
+  storage_account_access_key = azurerm_storage_account.sa.primary_access_key
+}`
+      },
+      {
+        id: "monitor",
+        label: "Azure Monitor / Alerts",
+        type: "Security",
+        x: 88,
+        y: 50,
+        role: "Generates push notifications, metrics alerts, and sends WhatsApp or Email alerts to the administrator.",
+        terraform: `resource "azurerm_monitor_action_group" "ops" {
+  name                = "finops-action-group"
+  resource_group_name = azurerm_resource_group.rg.name
+  short_name          = "finops-alert"
+
+  email_receiver {
+    name          = "send_admin"
+    email_address = "admin@fcruz.org"
+  }
+}`
+      }
+    ],
+    connections: [
+      { from: "client", to: "costapi" },
+      { from: "client", to: "tablestorage" },
+      { from: "costapi", to: "tablestorage" },
+      { from: "costapi", to: "alertfunc" },
+      { from: "tablestorage", to: "alertfunc" },
+      { from: "alertfunc", to: "monitor" }
+    ]
+  },
+  "baseline-cruzops": {
+    title: "CruzOps AI Architecture",
+    description: "Secure, managed NLP scripting pipeline invoking Azure OpenAI Service (GPT-4o) using Managed Identities to generate cloud configuration scripts instantly.",
+    nodes: [
+      {
+        id: "client",
+        label: "Web Chat UI",
+        type: "IaaS",
+        x: 15,
+        y: 50,
+        role: "User-facing terminal chat interface that accepts natural language queries and renders scripts.",
+        terraform: `resource "azurerm_static_web_app" "cruzops_portal" {
+  name                = "stapp-cruzops-prod"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = "eastus2"
+  sku_tier            = "Free"
+}`
+      },
+      {
+        id: "appservice",
+        label: "Azure App Service",
+        type: "Compute",
+        x: 35,
+        y: 50,
+        role: "Hosts the back-end middleware, orchestrates prompt safety filters, and routes OpenAI responses.",
+        terraform: `resource "azurerm_linux_web_app" "backend" {
+  name                = "app-cruzops-backend"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  service_plan_id     = azurerm_service_plan.asp.id
+
+  site_config {}
+  
+  identity {
+    type = "SystemAssigned"
+  }
+}`
+      },
+      {
+        id: "identity",
+        label: "Managed Identity",
+        type: "Security",
+        x: 35,
+        y: 20,
+        role: "System-assigned active directory identity that authenticates the App Service to the Key Vault securely.",
+        terraform: `// Included inside the Web App identity block:
+// identity {
+//   type = "SystemAssigned"
+// }`
+      },
+      {
+        id: "keyvault",
+        label: "Azure Key Vault",
+        type: "Security",
+        x: 60,
+        y: 20,
+        role: "Stores OpenAI API endpoint configurations, deployment keys, and rate metrics safely.",
+        terraform: `resource "azurerm_key_vault_access_policy" "read_policy" {
+  key_vault_id = azurerm_key_vault.kv.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_linux_web_app.backend.identity[0].principal_id
+
+  secret_permissions = ["Get", "List"]
+}`
+      },
+      {
+        id: "openai",
+        label: "Azure OpenAI (GPT-4o)",
+        type: "AI",
+        x: 60,
+        y: 50,
+        role: "Private AI endpoint. Resolves natural language requests into structured CLI or Terraform code.",
+        terraform: `resource "azurerm_cognitive_deployment" "gpt4" {
+  name                 = "gpt-4o"
+  cognitive_account_id = azurerm_cognitive_account.openai.id
+  model {
+    format  = "OpenAI"
+    name    = "gpt-4o"
+    version = "2024-05-13"
+  }
+  sku {
+    name = "Standard"
+  }
+}`
+      },
+      {
+        id: "loganalytics",
+        label: "Log Analytics Workspace",
+        type: "Database",
+        x: 85,
+        y: 50,
+        role: "Logs audit logs, request telemetry, prompt token costs, and system performance.",
+        terraform: `resource "azurerm_log_analytics_workspace" "logs" {
+  name                = "log-cruzops-audit"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}`
+      }
+    ],
+    connections: [
+      { from: "client", to: "appservice" },
+      { from: "appservice", to: "identity" },
+      { from: "identity", to: "keyvault" },
+      { from: "appservice", to: "openai" },
+      { from: "openai", to: "loganalytics" }
+    ]
+  }
+};
 
 const AZURE_TABLE_URL = "https://stcruzoneportal.table.core.windows.net/projects";
 const READ_SAS = "?se=2031-05-28T00%3A00%3A00Z&sp=r&spr=https&sv=2019-02-02&tn=projects&sig=GNq0ih2ur3z/1mO6H0ID9DaTSmXzOK2EUJ3gA%2BX1x4k%3D";
@@ -114,6 +601,10 @@ export default function App() {
   const [displayProject, setDisplayProject] = useState(null);
   const [activeIdxState, setActiveIdxState] = useState(0);
   const [theme, setTheme] = useState('dark');
+  const [activeTab, setActiveTab] = useState('projects');
+  const [activeArch, setActiveArch] = useState(null);
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [copied, setCopied] = useState(false);
   
   // Modals state
   const [showModal, setShowModal] = useState(false);
@@ -379,7 +870,7 @@ export default function App() {
 
   const startTimer = () => {
     stopTimer();
-    if (isPausedRef.current || order.length <= 1 || window.innerWidth < 992) return;
+    if (isPausedRef.current || order.length <= 1 || window.innerWidth < 992 || activeTab !== 'projects') return;
 
     gsap.set(".indicator", { x: -window.innerWidth });
 
@@ -398,6 +889,113 @@ export default function App() {
         });
       }
     });
+  };
+
+  const handleTabChange = (tab) => {
+    if (tab === activeTab || isAnimatingRef.current) return;
+    
+    // Stop rotation when leaving projects
+    if (tab !== 'projects') {
+      stopTimer();
+      gsap.set(".indicator", { x: -window.innerWidth });
+    }
+    
+    isAnimatingRef.current = true;
+    
+    // Target active tab elements
+    const outElements = activeTab === 'projects' 
+      ? ["#demo", ".details", ".showcase-container", ".pagination", ".fab"]
+      : [".certifications-showcase"];
+      
+    const inElements = tab === 'projects'
+      ? ["#demo", ".details", ".showcase-container", ".pagination", ".fab"]
+      : [".certifications-showcase"];
+
+    gsap.to(outElements, {
+      opacity: 0,
+      duration: 0.25,
+      stagger: 0.02,
+      onComplete: () => {
+        // Toggle tab state
+        setActiveTab(tab);
+        isPausedRef.current = tab !== 'projects';
+
+        // Clear indicator
+        gsap.set(".indicator", { x: -window.innerWidth });
+
+        // Set hidden state for target elements
+        gsap.set(inElements, { opacity: 0 });
+
+        // Wait a tiny bit and fade in
+        gsap.to(inElements, {
+          opacity: 1,
+          duration: 0.35,
+          stagger: 0.02,
+          onComplete: () => {
+            isAnimatingRef.current = false;
+            if (tab === 'projects') {
+              // Recalculate dimensions & reposition
+              updateLayoutDimensions();
+              positionCards(order);
+              startTimer();
+            }
+          }
+        });
+      }
+    });
+  };
+
+  const renderNodeIcon = (type) => {
+    switch (type) {
+      case 'IaaS': // Browser/Client
+        return (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
+          </svg>
+        );
+      case 'Network': // API Gateway / APIM / Cost API
+        return (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+        );
+      case 'Compute': // Functions / App Service
+        return (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
+        );
+      case 'Security': // Key Vault / Identity / Action Group
+        return (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        );
+      case 'Database': // Cosmos DB / Table Storage / Log Analytics
+        return (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <ellipse cx="12" cy="5" rx="9" ry="3" />
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+            <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3" />
+          </svg>
+        );
+      case 'AI': // OpenAI / Gemini
+        return (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-7.88A2.5 2.5 0 0 1 9.5 2z" />
+            <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-7.88A2.5 2.5 0 0 0 14.5 2z" />
+          </svg>
+        );
+      default:
+        return (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+          </svg>
+        );
+    }
   };
 
   const handleNext = async () => {
@@ -779,7 +1377,18 @@ export default function App() {
           <h1 className="brand-text">CruzOne Portal</h1>
         </div>
         <div className="nav-links">
-          <div className="active">Projects</div>
+          <button 
+            className={activeTab === 'projects' ? 'active' : 'nav-item'} 
+            onClick={() => handleTabChange('projects')}
+          >
+            Projects
+          </button>
+          <button 
+            className={activeTab === 'certifications' ? 'active' : 'nav-item'} 
+            onClick={() => handleTabChange('certifications')}
+          >
+            Certifications
+          </button>
           <a href="https://github.com/ajf013" target="_blank" rel="noopener noreferrer" className="nav-item">GitHub Profile</a>
           <button id="export-json-btn" onClick={handleExportJSON} className="nav-item-btn" title="Export Added Projects to JSON">Export Config</button>
           <button id="theme-toggle-btn" onClick={toggleTheme} className="theme-toggle" title="Toggle Light/Dark Theme">
@@ -798,7 +1407,9 @@ export default function App() {
 
       {/* Main Content Area */}
       <main>
-        {/* Card Carousel Holder */}
+        {activeTab === 'projects' && (
+          <>
+            {/* Card Carousel Holder */}
         <div 
           id="demo" 
         onMouseEnter={handleMouseEnter} 
@@ -843,6 +1454,19 @@ export default function App() {
                     )}
                     {project.repoUrl && (
                       <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="mobile-cta-btn repo">View Code</a>
+                    )}
+                    {project.hasArchitecture && (
+                      <button 
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          setActiveArch(project.id);
+                          setSelectedNode(ARCHITECTURES[project.id]?.nodes[0] || null);
+                          isPausedRef.current = true;
+                        }} 
+                        className="mobile-cta-btn arch"
+                      >
+                        Architecture
+                      </button>
                     )}
                     {project.isManual && (
                       <button 
@@ -904,6 +1528,19 @@ export default function App() {
           )}
           {(displayProject?.repoUrl || activeProject.repoUrl) && (
             <a href={displayProject?.repoUrl || activeProject.repoUrl} target="_blank" rel="noopener noreferrer" className="discover repo-btn">View Code</a>
+          )}
+          {(displayProject?.hasArchitecture || activeProject.hasArchitecture) && (
+            <button 
+              onClick={() => {
+                const projId = displayProject?.id || activeProject.id;
+                setActiveArch(projId);
+                setSelectedNode(ARCHITECTURES[projId]?.nodes[0] || null);
+                isPausedRef.current = true;
+              }} 
+              className="discover arch-btn"
+            >
+              Architecture
+            </button>
           )}
           {(displayProject?.isManual || activeProject.isManual) && (
             <button 
@@ -977,6 +1614,53 @@ export default function App() {
           </div>
         </div>
       </div>
+          </>
+        )}
+
+        {activeTab === 'certifications' && (
+          <div className="certifications-showcase">
+            <header className="certs-header">
+              <div className="mct-badge-container">
+                <div className="mct-badge-glow"></div>
+                <div className="mct-badge-inner">
+                  <div className="mct-badge-header">
+                    <img src="./icon.png" alt="Microsoft Logo" className="mct-logo-icon" />
+                    <span>Microsoft Certified Trainer</span>
+                  </div>
+                  <div className="mct-badge-title">Francis Ponnu Cruz I</div>
+                  <div className="mct-badge-subtitle">Credential ID & MCT Active Status Verified</div>
+                  <div className="mct-badge-meta">
+                    <span className="mct-status-pill">Active Status: 2023 - 2026</span>
+                    <a href="https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications" target="_blank" rel="noopener noreferrer" className="mct-verify-btn">Verify MCT Profile</a>
+                  </div>
+                </div>
+              </div>
+            </header>
+
+            <div className="certs-grid">
+              {CERTIFICATIONS.filter(c => c.id !== 'mct').map((cert) => (
+                <div key={cert.id} className="cert-card-wrapper">
+                  <div className={`cert-card ${cert.badge}`}>
+                    <div className="cert-card-glow"></div>
+                    <div className="cert-card-inner">
+                      <div className="cert-badge-type">{cert.type}</div>
+                      <h3 className="cert-title">{cert.title}</h3>
+                      <div className="cert-issuer">Issued by {cert.issuer}</div>
+                      <div className="cert-date">Issued: {cert.date}</div>
+                      <p className="cert-desc">{cert.desc}</p>
+                      <a href={cert.verifyUrl} target="_blank" rel="noopener noreferrer" className="cert-verify-link">
+                        Verify Credential
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="arrow-icon">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
     </main>
 
       {/* Mobile view footer (hidden on desktop) */}
@@ -1004,35 +1688,37 @@ export default function App() {
       </footer>
 
       {/* Pagination Controls */}
-      <div 
-        className="pagination" 
-        id="pagination"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onTouchStart={handleMouseEnter}
-        onTouchEnd={handleMouseLeave}
-      >
-        <div className="arrow arrow-left" onClick={handlePrev}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.75 19.5L8.25 12l7.5-7.5" />
-          </svg>
-        </div>
-        <div className="arrow arrow-right" onClick={handleNext}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-          </svg>
-        </div>
-        <div className="progress-sub-container">
-          <div className="progress-sub-background">
-            <div className="progress-sub-foreground"></div>
+      {activeTab === 'projects' && (
+        <div 
+          className="pagination" 
+          id="pagination"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onTouchStart={handleMouseEnter}
+          onTouchEnd={handleMouseLeave}
+        >
+          <div className="arrow arrow-left" onClick={handlePrev}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </div>
+          <div className="arrow arrow-right" onClick={handleNext}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </div>
+          <div className="progress-sub-container">
+            <div className="progress-sub-background">
+              <div className="progress-sub-foreground"></div>
+            </div>
+          </div>
+          <div className="slide-numbers" id="slide-numbers">
+            {projects.map((_, idx) => (
+              <div key={idx} className="item" id={`slide-item-${idx}`}>{idx + 1}</div>
+            ))}
           </div>
         </div>
-        <div className="slide-numbers" id="slide-numbers">
-          {projects.map((_, idx) => (
-            <div key={idx} className="item" id={`slide-item-${idx}`}>{idx + 1}</div>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* Cover screen loader */}
       <div className="cover">
@@ -1046,16 +1732,18 @@ export default function App() {
       </div>
 
       {/* Add Project FAB */}
-      <button 
-        className="fab" 
-        id="add-project-fab" 
-        onClick={() => { setShowModal(true); isPausedRef.current = true; }} 
-        title="Add Project Manually"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-      </button>
+      {activeTab === 'projects' && (
+        <button 
+          className="fab" 
+          id="add-project-fab" 
+          onClick={() => { setShowModal(true); isPausedRef.current = true; }} 
+          title="Add Project Manually"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+        </button>
+      )}
 
       {/* Add Project Modal */}
       <div className={`modal ${showModal ? 'show' : ''}`} onClick={(e) => { if (e.target.classList.contains('modal')) { setShowModal(false); isPausedRef.current = false; } }}>
@@ -1135,6 +1823,122 @@ export default function App() {
         </div>
         <button className="update-banner-btn" onClick={handleUpdateRefresh}>Update & Refresh</button>
       </div>
+
+      {/* Architecture Playground Modal */}
+      {activeArch && ARCHITECTURES[activeArch] && (
+        <div className="arch-modal show" onClick={(e) => { if (e.target.classList.contains('arch-modal')) { setActiveArch(null); setSelectedNode(null); } }}>
+          <div className="arch-modal-content">
+            <div className="arch-modal-header">
+              <div>
+                <h2>{ARCHITECTURES[activeArch].title}</h2>
+                <p className="arch-modal-sub">{ARCHITECTURES[activeArch].description}</p>
+              </div>
+              <button className="close-btn" onClick={() => { setActiveArch(null); setSelectedNode(null); }}>&times;</button>
+            </div>
+            
+            <div className="arch-modal-body">
+              {/* Interactive Canvas (Left Side) */}
+              <div className="arch-canvas-wrapper">
+                <div className="arch-canvas">
+                  {/* Underlay connections using SVG */}
+                  <svg className="arch-connections" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    {ARCHITECTURES[activeArch].connections.map((conn, idx) => {
+                      const fromNode = ARCHITECTURES[activeArch].nodes.find(n => n.id === conn.from);
+                      const toNode = ARCHITECTURES[activeArch].nodes.find(n => n.id === conn.to);
+                      if (!fromNode || !toNode) return null;
+                      return (
+                        <g key={idx}>
+                          <line
+                            x1={`${fromNode.x}%`}
+                            y1={`${fromNode.y}%`}
+                            x2={`${toNode.x}%`}
+                            y2={`${toNode.y}%`}
+                            className="connection-line-bg"
+                          />
+                          <line
+                            x1={`${fromNode.x}%`}
+                            y1={`${fromNode.y}%`}
+                            x2={`${toNode.x}%`}
+                            y2={`${toNode.y}%`}
+                            className="connection-line-fg"
+                          />
+                        </g>
+                      );
+                    })}
+                  </svg>
+
+                  {/* Nodes positioned absolutely */}
+                  {ARCHITECTURES[activeArch].nodes.map((node) => {
+                    const isSelected = selectedNode?.id === node.id;
+                    const nodeTypeColorMap = {
+                      IaaS: "node-blue",
+                      Network: "node-teal",
+                      Compute: "node-orange",
+                      Security: "node-green",
+                      Database: "node-purple",
+                      AI: "node-gold"
+                    };
+                    const nodeClass = nodeTypeColorMap[node.type] || "node-blue";
+
+                    return (
+                      <div
+                        key={node.id}
+                        className={`arch-node ${nodeClass} ${isSelected ? 'active' : ''}`}
+                        style={{ left: `${node.x}%`, top: `${node.y}%` }}
+                        onMouseEnter={() => { setSelectedNode(node); setCopied(false); }}
+                        onClick={() => { setSelectedNode(node); setCopied(false); }}
+                      >
+                        <div className="node-glow"></div>
+                        <div className="node-icon-box">
+                          {renderNodeIcon(node.type)}
+                        </div>
+                        <div className="node-label">{node.label}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Sidebar Code / Info (Right Side) */}
+              <div className="arch-sidebar">
+                {selectedNode ? (
+                  <div className="node-details">
+                    <span className={`node-badge-type ${selectedNode.type.toLowerCase()}`}>{selectedNode.type}</span>
+                    <h3>{selectedNode.label}</h3>
+                    <p className="node-role">{selectedNode.role}</p>
+                    
+                    <div className="terraform-code-section">
+                      <div className="code-header">
+                        <span>Terraform Definition</span>
+                        <button 
+                          className="copy-code-btn"
+                          onClick={() => {
+                            navigator.clipboard.writeText(selectedNode.terraform);
+                            setCopied(true);
+                            setTimeout(() => setCopied(false), 2000);
+                          }}
+                        >
+                          {copied ? "Copied!" : "Copy Code"}
+                        </button>
+                      </div>
+                      <pre className="terraform-code">
+                        <code>{selectedNode.terraform}</code>
+                      </pre>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="node-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.303.197-1.591 1.591M21 12h-2.25m-.197 5.303-1.591-1.591M12 21.75V19.5m-5.303-.197 1.591-1.591M3 12h2.25m.197-5.303 1.591 1.591" />
+                    </svg>
+                    <p>Hover or click on any architecture node to inspect its configurations and copy its Terraform declarations.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

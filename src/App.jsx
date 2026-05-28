@@ -591,9 +591,8 @@ const ARCHITECTURES = {
   }
 };
 
-const AZURE_TABLE_URL = "https://stcruzoneportal.table.core.windows.net/projects";
-const READ_SAS = "?se=2031-05-28T00%3A00%3A00Z&sp=r&spr=https&sv=2019-02-02&tn=projects&sig=GNq0ih2ur3z/1mO6H0ID9DaTSmXzOK2EUJ3gA%2BX1x4k%3D";
-const WRITE_SAS = "?se=2031-05-28T00%3A00%3A00Z&sp=raud&spr=https&sv=2019-02-02&tn=projects&sig=K38%2BEO2el0VRrI%2BQ2Tis5yBezDKKcKeZIqtQyPkQZXQ%3D";
+const AZURE_TABLE_URL = import.meta.env.VITE_AZURE_TABLE_URL || "https://stcruzoneportal.table.core.windows.net/projects";
+const READ_SAS = import.meta.env.VITE_READ_SAS || "?se=2031-05-28T00%3A00%3A00Z&sp=r&spr=https&sv=2019-02-02&tn=projects&sig=GNq0ih2ur3z/1mO6H0ID9DaTSmXzOK2EUJ3gA%2BX1x4k%3D";
 
 export default function App() {
   const [projects, setProjects] = useState([]);
@@ -1057,7 +1056,20 @@ export default function App() {
 
   // Helper to get Write SAS token
   const getWriteSas = () => {
-    return WRITE_SAS;
+    let localSas = localStorage.getItem('cruz_portal_write_sas');
+    if (!localSas) {
+      localSas = import.meta.env.VITE_WRITE_SAS;
+    }
+    if (!localSas) {
+      localSas = prompt("Please enter the Admin Write SAS Token to authorize this action:");
+      if (localSas) {
+        if (localSas.includes('?')) {
+          localSas = localSas.substring(localSas.indexOf('?'));
+        }
+        localStorage.setItem('cruz_portal_write_sas', localSas);
+      }
+    }
+    return localSas;
   };
 
   // PWA Check Updates

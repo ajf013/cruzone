@@ -1,0 +1,10 @@
+{
+  "version": "1.3.0",
+  "date": "2026-05-28",
+  "changelog": [
+    "Released complete premium Bento-style glassmorphic dashboard UI overhaul.",
+    "Integrated floating browser mockup window for desktop screen visual showcases.",
+    "Added mobile stacked browser mockup cards for native scrolling feeds.",
+    "Replaced heavy semantic dependencies with lightweight custom SVG docks."
+  ]
+}

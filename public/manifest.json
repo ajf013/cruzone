@@ -1,0 +1,24 @@
+{
+  "short_name": "CruzOne",
+  "name": "CruzOne Personal Projects Portal",
+  "description": "A premium personal projects portal by ajf013 (fcruz).",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#0d0e12",
+  "theme_color": "#ecad29",
+  "display": "standalone",
+  "orientation": "portrait-primary"
+}

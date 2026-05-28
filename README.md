@@ -1,6 +1,17 @@
 # CruzOne Projects Portal
 
-A high-performance, responsive personal projects showcase designed with a premium glassmorphic dark-mode UI. It serves as a fully featured Progressive Web Application (PWA) that aggregates baseline GitHub project repositories and permits adding and managing projects dynamically.
+A high-performance, responsive personal projects showcase designed with a premium glassmorphic dark-mode UI. It serves as a fully featured Progressive Web Application (PWA) that aggregates baseline GitHub project repositories, fetches dynamic projects from a serverless database, showcases verified credentials, and provides interactive cloud architecture playgrounds.
+
+---
+
+## ✨ Features
+
+1. **MCT Badge & Certification Showcase**: A visually stunning verified showcase of Microsoft and AWS certifications, complete with tier-colored glassmorphic backlight glows (Expert: Purple, Associate: Blue, Fundamentals: Teal, AWS: Orange, Challenge: Green) and a golden Microsoft Certified Trainer (MCT) verification banner linked directly to MS Learn.
+2. **Interactive Azure Architecture Playgrounds**: Immersive, responsive SVG resource maps for key cloud-native projects. Users can click or hover on nodes to see resource descriptions, role definitions, and copy raw HashiCorp Terraform configuration code to their clipboards.
+3. **Serverless NoSQL Database Integration**: Real-time project syncing using Azure Table Storage ($0.00 cost backend) with read-only operations using SAS tokens compiled client-side, and administrative write/delete CRUD operations powered by an admin-supplied SAS key.
+4. **Mobile Ergonomics**: Restructured layout stacking project cards vertically on mobile screen widths (< 992px) for normal touch-scrolling, with dedicated mobile footer docks.
+5. **SEO & Social Sharing Optimization**: Seamless metadata integration with Open Graph and Twitter tags for optimized sharing views, and semantic HTML structure layout for crawlability.
+6. **Dynamic PWA Updates**: Fully installable offline app checking and notifying users of version updates dynamically.
 
 ---
 
@@ -14,8 +25,15 @@ A high-performance, responsive personal projects showcase designed with a premiu
 | **CSS3** | ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white) | `Custom` | Vanilla layout stylesheet with responsive design systems |
 | **JavaScript** | ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) | `ESNext` | Core script compilation |
 
-### Libraries & Infrastructure
-| Library/Service | Badge | Version | Description |
+### Backend & Cloud Services
+| Service | Badge | Tier / Cost | Description |
+| :--- | :--- | :--- | :--- |
+| **Azure Table Storage** | ![Azure Storage](https://img.shields.io/badge/Azure_Storage-0089D6?style=flat-square&logo=microsoftazure&logoColor=white) | `Serverless ($0/mo)` | Low-cost, serverless NoSQL database storing projects |
+| **Azure Static Web Apps** | ![Azure Static Web Apps](https://img.shields.io/badge/Azure_SWA-0089D6?style=flat-square&logo=microsoftazure&logoColor=white) | `Free Tier ($0/mo)` | Global production hosting for client distribution |
+| **SAS Tokens** | ![SAS Security](https://img.shields.io/badge/Shared_Access_Signatures-0089D6?style=flat-square&logo=microsoftazure&logoColor=white) | `Built-in` | Restricts API access with read-only vs admin-write privileges |
+
+### Frontend Utilities
+| Library | Badge | Version | Description |
 | :--- | :--- | :--- | :--- |
 | **GSAP** | ![GSAP](https://img.shields.io/badge/GSAP-88CE02?style=flat-square&logo=greensock&logoColor=white) | `^3.15.0` | Professional-grade layout scaling and slider transitions |
 | **PWA** | ![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=flat-square&logo=progressive-web-apps&logoColor=white) | `Service Worker` | Offline cache support and stand-alone home-screen app installs |
@@ -25,27 +43,35 @@ A high-performance, responsive personal projects showcase designed with a premiu
 
 ## 🗺️ System Architecture
 
-The portal dynamically switches between a GSAP-powered horizontal carousel slider on desktop viewports and a stacked card feed on mobile screen sizes.
+The portal dynamically switches active view tabs using GSAP fades, retrieves dynamic database objects, and renders interactive playgrounds.
 
 ```mermaid
 graph TD
-    subgraph "Client Application (React & GSAP)"
+    subgraph "Client Application (React)"
         A[index.html] --> B[main.jsx]
         B --> C[App.jsx]
-        C --> D{Viewport Width?}
         
-        %% Layout Rendering
-        D -- ">= 992px (Desktop)" --> E[GSAP Horizontal Carousel Slider]
-        D -- "< 992px (Mobile)" --> F[Stacked Flex Column Project Feed]
+        %% Tab Switching
+        C --> D{Active Tab State?}
+        D -- "Projects Tab" --> E[Desktop Carousel / Mobile Stack Feed]
+        D -- "Certifications Tab" --> F[MCT Showcase & Certifications Grid]
         
-        %% State Management
-        C --> G[(LocalStorage Projects)]
-        C --> H[(Theme State)]
+        %% Architecture Modal
+        E --> G[View Architecture Button]
+        G --> H[Interactive SVG Playground Canvas]
+        H --> |Hover or Click Node| I[Load Node Terraform Code & Descriptions]
+        I --> |Copy Button| J[navigator.clipboard Copy Code]
+    end
+
+    subgraph "Serverless Database & API"
+        K[(Azure Table Storage)]
+        C --> |Fetch via GET + Read SAS| K
+        C --> |Admin POST/DELETE + Write SAS| K
     end
 
     subgraph "Service Worker & Offline Cache (PWA)"
-        I[sw.js] <--> |"Caches Assets & screenshots"| J[(Cache Storage)]
-        C --> |Register SW| I
+        L[sw.js] <--> |"Cache assets & screenshots"| M[(Cache Storage)]
+        C --> |Register SW| L
     end
 ```
 
@@ -95,7 +121,7 @@ flowchart TD
 │   └── projects/            # Baseline project mockup screenshot assets
 └── src/
     ├── main.jsx             # Entry point
-    ├── App.jsx              # Main Application containing Carousel Slider, Grid, and State controller
+    ├── App.jsx              # Main Application containing Carousel Slider, Grid, Node Playgrounds, and State controller
     ├── index.css            # Stylesheet containing design system, desktop animations & mobile layout overrides
     └── assets/              # Local static assets
 ```

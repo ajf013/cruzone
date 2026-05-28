@@ -29,7 +29,7 @@ The portal dynamically switches between a GSAP-powered horizontal carousel slide
 
 ```mermaid
 graph TD
-    subgraph Client Application (React & GSAP)
+    subgraph "Client Application (React & GSAP)"
         A[index.html] --> B[main.jsx]
         B --> C[App.jsx]
         C --> D{Viewport Width?}
@@ -43,8 +43,8 @@ graph TD
         C --> H[(Theme State)]
     end
 
-    subgraph Service Worker & Offline Cache (PWA)
-        I[sw.js] <--> |Caches Assets & screenshots| J[(Cache Storage)]
+    subgraph "Service Worker & Offline Cache (PWA)"
+        I[sw.js] <--> |"Caches Assets & screenshots"| J[(Cache Storage)]
         C --> |Register SW| I
     end
 ```

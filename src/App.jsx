@@ -106,6 +106,7 @@ const BASELINE_PROJECTS = [
 
 const AZURE_TABLE_URL = "https://stcruzoneportal.table.core.windows.net/projects";
 const READ_SAS = "?se=2031-05-28T00%3A00%3A00Z&sp=r&spr=https&sv=2019-02-02&tn=projects&sig=GNq0ih2ur3z/1mO6H0ID9DaTSmXzOK2EUJ3gA%2BX1x4k%3D";
+const WRITE_SAS = "?se=2031-05-28T00%3A00%3A00Z&sp=raud&spr=https&sv=2019-02-02&tn=projects&sig=K38%2BEO2el0VRrI%2BQ2Tis5yBezDKKcKeZIqtQyPkQZXQ%3D";
 
 export default function App() {
   const [projects, setProjects] = useState([]);
@@ -456,37 +457,9 @@ export default function App() {
     }
   };
 
-  // Configure Write SAS Token
-  const handleConfigureSas = () => {
-    const current = localStorage.getItem('cruz_portal_write_sas') || '';
-    const token = prompt("Enter Azure Write SAS Token (starts with '?se='):\nLeave empty to clear.", current);
-    if (token === null) return;
-    if (!token.trim()) {
-      localStorage.removeItem('cruz_portal_write_sas');
-      alert("Admin SAS Token cleared.");
-    } else {
-      let formatted = token.trim();
-      if (!formatted.startsWith('?')) {
-        formatted = '?' + formatted;
-      }
-      localStorage.setItem('cruz_portal_write_sas', formatted);
-      alert("Admin SAS Token configured successfully!");
-    }
-  };
-
-  // Helper to get Write SAS token with configuration fallback prompt
+  // Helper to get Write SAS token
   const getWriteSas = () => {
-    let token = localStorage.getItem('cruz_portal_write_sas') || '';
-    if (!token) {
-      const input = prompt("Admin authentication required.\nPlease enter the Azure Write SAS Token:");
-      if (!input) return null;
-      token = input.trim();
-      if (!token.startsWith('?')) {
-        token = '?' + token;
-      }
-      localStorage.setItem('cruz_portal_write_sas', token);
-    }
-    return token;
+    return WRITE_SAS;
   };
 
   // PWA Check Updates
@@ -809,7 +782,6 @@ export default function App() {
           <div className="active">Projects</div>
           <a href="https://github.com/ajf013" target="_blank" rel="noopener noreferrer" className="nav-item">GitHub Profile</a>
           <button id="export-json-btn" onClick={handleExportJSON} className="nav-item-btn" title="Export Added Projects to JSON">Export Config</button>
-          <button id="configure-sas-btn" onClick={handleConfigureSas} className="nav-item-btn" title="Configure Azure Write SAS Token">Admin Key</button>
           <button id="theme-toggle-btn" onClick={toggleTheme} className="theme-toggle" title="Toggle Light/Dark Theme">
             {theme === 'dark' ? (
               <svg className="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

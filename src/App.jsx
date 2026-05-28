@@ -662,6 +662,7 @@ export default function App() {
 
       <nav>
         <div className="brand">
+          <img src="./icon.png" alt="CruzOne Logo" className="brand-logo" />
           <h1 className="brand-text">CruzOne Portal</h1>
         </div>
         <div className="nav-links">

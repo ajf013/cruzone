@@ -500,7 +500,7 @@ nav .brand-text {
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--accent-color);
-  background: linear-gradient(to right, #ffffff, var(--accent-color));
+  background: linear-gradient(to right, var(--text-color), var(--accent-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -1137,7 +1137,8 @@ nav .theme-toggle:hover {
     width: 100% !important;
     height: auto !important;
     transform: none !important;
-    background-color: var(--card-bg) !important;
+    background-image: none !important;
+    background: var(--card-bg) !important;
     border: 1px solid var(--border-color) !important;
     border-radius: 20px !important;
     box-shadow: 0 12px 30px var(--card-shadow) !important;

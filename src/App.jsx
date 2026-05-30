@@ -591,8 +591,8 @@ const ARCHITECTURES = {
   }
 };
 
-const AZURE_TABLE_URL = import.meta.env.VITE_AZURE_TABLE_URL || "https://stcruzoneportal.table.core.windows.net/projects";
-const READ_SAS = import.meta.env.VITE_READ_SAS || "?se=2031-05-28T00%3A00%3A00Z&sp=r&spr=https&sv=2019-02-02&tn=projects&sig=GNq0ih2ur3z/1mO6H0ID9DaTSmXzOK2EUJ3gA%2BX1x4k%3D";
+const AZURE_TABLE_URL = import.meta.env.VITE_AZURE_TABLE_URL || "";
+const READ_SAS = import.meta.env.VITE_READ_SAS || "";
 
 export default function App() {
   const [projects, setProjects] = useState([]);
@@ -1029,6 +1029,10 @@ export default function App() {
 
   // Fetch manually added projects from Azure Table Storage
   const fetchCloudProjects = async () => {
+    if (!AZURE_TABLE_URL || !READ_SAS) {
+      console.warn("Azure Table URL or Read SAS token is missing.");
+      return null;
+    }
     try {
       const res = await fetch(`${AZURE_TABLE_URL}()${READ_SAS}`, {
         headers: {

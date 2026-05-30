@@ -618,6 +618,7 @@ export default function App() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiPreviewUrl, setAiPreviewUrl] = useState('');
   const [showInstallBanner, setShowInstallBanner] = useState(false);
+  const [authTimeout, setAuthTimeout] = useState(false);
   
   // Modals state
   const [showModal, setShowModal] = useState(false);
@@ -1240,6 +1241,19 @@ export default function App() {
       setIsAdmin(false);
     }
   }, [isLoaded, isSignedIn, user]);
+  
+  // Auth loading timeout monitor
+  useEffect(() => {
+    if (!isLoaded) {
+      const timer = setTimeout(() => {
+        setAuthTimeout(true);
+      }, 5000);
+      return () => clearTimeout(timer);
+    } else {
+      setAuthTimeout(false);
+    }
+  }, [isLoaded]);
+
   useEffect(() => {
     // 2. Request Notification Permission
     if ('Notification' in window && Notification.permission === 'default') {
@@ -1556,9 +1570,15 @@ export default function App() {
               <SignIn redirectUrl="/cruz-admin" routing="hash" />
             )
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '40px 20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '40px 20px', textAlign: 'center' }}>
               <span className="spinner"></span>
               <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Loading authentication...</span>
+              {authTimeout && (
+                <div style={{ marginTop: '16px', padding: '12px', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)', backgroundColor: 'rgba(239, 68, 68, 0.05)', color: '#f87171', fontSize: '12px', lineHeight: '1.4' }}>
+                  <strong>Clerk taking too long to load?</strong>
+                  <p style={{ margin: '4px 0 0 0' }}>This usually means the Clerk Publishable Key is not configured correctly on the server. Please verify your <code>VITE_CLERK_PUBLISHABLE_KEY</code> is set in Netlify's Environment Variables and that you've triggered a new deploy.</p>
+                </div>
+              )}
             </div>
           )}
           <a href="/" className="back-to-home-link">← Back to Public Site</a>

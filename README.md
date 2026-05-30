@@ -140,11 +140,13 @@ Create a `.env` file in the root of the project using the structure from `.env.e
 ├── .gitignore                  # Git untracked pattern definitions
 ├── eslint.config.js            # Lint config rules
 ├── index.html                  # Core HTML structure template
+├── netlify.toml                # Netlify SPA redirect configurations
 ├── package.json                # Project dependencies and script declarations
 ├── package-lock.json           # Locked dependencies mapping
 ├── README.md                   # Project documentation (this file)
 ├── vite.config.js              # Vite compiler configuration
 ├── public/
+│   ├── _redirects              # Netlify fallback routing rule for client-side SPAs
 │   ├── favicon.svg             # Application tab browser icon
 │   ├── icon.png                # Brand identity logo
 │   ├── icons.svg               # Inline SVG sprite icons

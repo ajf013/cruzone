@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { useUser, useClerk, SignIn } from '@clerk/clerk-react';
+import { deduceLiveUrl, getScreenshotUrl } from './services/aiService';
 
 // Baseline projects mapping to real GitHub profile ajf013
 const BASELINE_PROJECTS = [
@@ -123,7 +125,7 @@ const CERTIFICATIONS = [
     badge: "mct",
     type: "Trainer",
     desc: "Microsoft's premier technical training credential, verifying pedagogy skills and authorization to deliver official curriculum.",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "solutions-architect",
@@ -134,7 +136,7 @@ const CERTIFICATIONS = [
     badge: "expert",
     type: "Expert",
     desc: "Validates expertise in designing cloud solutions spanning compute, network, storage, governance, and security infrastructures.",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "designing-azure-solutions",
@@ -145,7 +147,7 @@ const CERTIFICATIONS = [
     badge: "associate",
     type: "Specialty",
     desc: "Validates advanced skills in designing Azure infrastructure solutions, including compute, storage, networking, and security.",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "azure-administrator",
@@ -156,7 +158,7 @@ const CERTIFICATIONS = [
     badge: "associate",
     type: "Associate",
     desc: "Validates skills in implementing, managing, and monitoring identity, governance, storage, compute, and virtual networks in cloud environments.",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "azure-security",
@@ -167,7 +169,7 @@ const CERTIFICATIONS = [
     badge: "associate",
     type: "Associate",
     desc: "Validates capabilities in implementing threat protection, managing identity access, and securing networks, data, and applications.",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "azure-network",
@@ -178,7 +180,7 @@ const CERTIFICATIONS = [
     badge: "associate",
     type: "Associate",
     desc: "Validates routing and network design capabilities, virtual networking, load balancing, hybrid connections, and network security policies.",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "aws-practitioner",
@@ -189,7 +191,7 @@ const CERTIFICATIONS = [
     badge: "aws",
     type: "AWS",
     desc: "Validates a high-level understanding of AWS Cloud services, basic security guidelines, compliance, and billing systems.",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "azure-fundamentals",
@@ -200,7 +202,7 @@ const CERTIFICATIONS = [
     badge: "fundamentals",
     type: "Fundamentals",
     desc: "Validates foundational knowledge of cloud concepts, core Azure services, management tools, security, governance, and cost tracking.",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "azure-data",
@@ -211,7 +213,7 @@ const CERTIFICATIONS = [
     badge: "fundamentals",
     type: "Fundamentals",
     desc: "Validates foundational knowledge of core data concepts and how they are implemented using Azure data services.",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "azure-ai",
@@ -222,7 +224,7 @@ const CERTIFICATIONS = [
     badge: "fundamentals",
     type: "Fundamentals",
     desc: "Validates foundational understanding of machine learning (ML) and artificial intelligence (AI) workloads and their Azure implementations.",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "security-fundamentals",
@@ -233,7 +235,7 @@ const CERTIFICATIONS = [
     badge: "fundamentals",
     type: "Fundamentals",
     desc: "Validates baseline knowledge of security, compliance, and identity solutions across Microsoft cloud services.",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "power-platform",
@@ -244,7 +246,7 @@ const CERTIFICATIONS = [
     badge: "fundamentals",
     type: "Fundamentals",
     desc: "Validates understanding of the business value and product capabilities of Power Platform (Power Apps, Power BI, Automate).",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "m365-fundamentals",
@@ -255,7 +257,7 @@ const CERTIFICATIONS = [
     badge: "fundamentals",
     type: "Fundamentals",
     desc: "Validates foundational understanding of the options available in Microsoft 365, cloud service lifecycles, and security practices.",
-    verifyUrl: "https://learn.microsoft.com/en-us/users/franciscruz-1301/credentials"
+    verifyUrl: "https://www.credly.com/users/fcruz"
   },
   {
     id: "ms-challenge",
@@ -595,6 +597,9 @@ const AZURE_TABLE_URL = import.meta.env.VITE_AZURE_TABLE_URL || "";
 const READ_SAS = import.meta.env.VITE_READ_SAS || "";
 
 export default function App() {
+  const { user, isLoaded, isSignedIn } = useUser();
+  const { signOut } = useClerk();
+
   const [projects, setProjects] = useState([]);
   const [order, setOrder] = useState([]);
   const [displayProject, setDisplayProject] = useState(null);
@@ -604,6 +609,15 @@ export default function App() {
   const [activeArch, setActiveArch] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
   const [copied, setCopied] = useState(false);
+  
+  // Admin & PWA state
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [installPromptEvent, setInstallPromptEvent] = useState(null);
+  
+  // AI background service states
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiPreviewUrl, setAiPreviewUrl] = useState('');
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
   
   // Modals state
   const [showModal, setShowModal] = useState(false);
@@ -1071,7 +1085,10 @@ export default function App() {
           localSas = localSas.substring(localSas.indexOf('?'));
         }
         localStorage.setItem('cruz_portal_write_sas', localSas);
+        setIsAdmin(true);
       }
+    } else {
+      setIsAdmin(true);
     }
     return localSas;
   };
@@ -1105,6 +1122,21 @@ export default function App() {
       } else if (localV !== serverV) {
         setShowUpdate(true);
         isPausedRef.current = true;
+        
+        // Trigger browser notification for update
+        if ('Notification' in window && Notification.permission === 'granted') {
+          const notification = new Notification("CruzOne Portal Update", {
+            body: `Version v${serverV} is available! Click to update and refresh.`,
+            icon: './icon.png',
+            tag: 'pwa-update',
+            requireInteraction: true
+          });
+          notification.onclick = () => {
+            window.focus();
+            handleUpdateRefresh();
+            notification.close();
+          };
+        }
       }
     } catch (err) {
       console.warn('Update check failed', err);
@@ -1190,6 +1222,76 @@ export default function App() {
     };
   }, []);
 
+  // Admin Check, Notifications & PWA Install
+  useEffect(() => {
+    // Admin mode authentication check via Clerk only
+    if (isLoaded) {
+      if (isSignedIn && user) {
+        const adminEmail = (import.meta.env.VITE_ADMIN_EMAIL || "anto13franc@outlook.com").toLowerCase();
+        const hasAdminEmail = user.emailAddresses.some(
+          e => e.emailAddress.toLowerCase() === adminEmail
+        );
+        
+        if (hasAdminEmail) {
+          setIsAdmin(true);
+          return;
+        }
+      }
+      setIsAdmin(false);
+    }
+  }, [isLoaded, isSignedIn, user]);
+  useEffect(() => {
+    // 2. Request Notification Permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      setTimeout(() => {
+        Notification.requestPermission();
+      }, 3000);
+    }
+
+    // 3. PWA Installation Event Listeners
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setInstallPromptEvent(e);
+      setShowInstallBanner(true);
+
+      // Trigger local browser notification that app is ready to install
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const notification = new Notification("CruzOne Portal", {
+          body: "Install CruzOne Portal for an immersive offline experience!",
+          icon: './icon.png',
+          tag: 'pwa-installable'
+        });
+        notification.onclick = () => {
+          window.focus();
+          e.prompt();
+          notification.close();
+        };
+      }
+    };
+
+    const handleAppInstalled = () => {
+      setInstallPromptEvent(null);
+      setShowInstallBanner(false);
+      
+      // Trigger confirmation notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification("CruzOne Portal Installed!", {
+          body: "CruzOne Portal has been successfully installed as an app.",
+          icon: './icon.png',
+          tag: 'pwa-installed'
+        });
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
   // Position cards whenever projects/order loads
   useEffect(() => {
     if (order.length > 0) {
@@ -1214,6 +1316,50 @@ export default function App() {
       indicatorTweenRef.current.resume();
     } else if (!isAnimatingRef.current) {
       startTimer();
+    }
+  };
+
+  // AI URL and Background Screenshot Generation
+  const handleAiBackgroundGeneration = async () => {
+    // 1. If live URL is already provided, skip AI deduction and directly set screenshot background
+    if (pLive.trim()) {
+      const screenshot = getScreenshotUrl(pLive.trim());
+      setPCustomImage(screenshot);
+      setCoverStyle('custom');
+      setAiPreviewUrl(screenshot);
+      return;
+    }
+
+    // 2. Validate that we have enough information to run the AI search
+    if (!pTitle.trim()) {
+      alert("Please enter a Project Title so the AI knows what to search for.");
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const deducedUrl = await deduceLiveUrl(
+        pTitle,
+        pCategory,
+        pDesc,
+        pRepo
+      );
+
+      if (deducedUrl) {
+        setPLive(deducedUrl);
+        const screenshot = getScreenshotUrl(deducedUrl);
+        setPCustomImage(screenshot);
+        setCoverStyle('custom');
+        setAiPreviewUrl(screenshot);
+        alert(`AI successfully found the live URL: ${deducedUrl} and captured a background screenshot!`);
+      } else {
+        alert("Azure OpenAI could not deduce a live URL for this project. Please enter a Live URL manually and click this button again to generate the screenshot background.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("AI Service Error: " + err.message);
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -1261,6 +1407,7 @@ export default function App() {
       if (!res.ok) {
         if (res.status === 403 || res.status === 401 || res.status === 400) {
           localStorage.removeItem('cruz_portal_write_sas');
+          setIsAdmin(false);
           alert("Access Denied! The Admin SAS Token is invalid, expired, or has insufficient permissions.");
           return;
         }
@@ -1296,6 +1443,7 @@ export default function App() {
       setPRepo('');
       setCoverStyle('gradient-deep-blue');
       setPCustomImage('');
+      setAiPreviewUrl('');
       isPausedRef.current = false;
 
       // Reset carousel showing the newly added index 0
@@ -1327,6 +1475,7 @@ export default function App() {
         if (!res.ok) {
           if (res.status === 403 || res.status === 401 || res.status === 400) {
             localStorage.removeItem('cruz_portal_write_sas');
+            setIsAdmin(false);
             alert("Access Denied! The Admin SAS Token is invalid or expired.");
             return;
           }
@@ -1383,6 +1532,41 @@ export default function App() {
   const activeIdx = order[0] ?? 0;
   const activeProject = projects[activeIdx] || { place: '', title: '', title2: '', description: '' };
 
+  // Path checking for admin custom URL login page
+  const isCustomAdminPath = window.location.pathname === '/cruz-admin';
+  if (isCustomAdminPath && !isAdmin) {
+    return (
+      <div className="clerk-auth-container">
+        <div className="clerk-auth-card">
+          <div className="clerk-auth-header">
+            <h2>CruzOne Portal</h2>
+            <p>Admin Authentication via GitHub</p>
+          </div>
+          {isLoaded ? (
+            isSignedIn ? (
+              <div className="clerk-auth-denied">
+                <svg className="denied-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+                <h3>Access Denied</h3>
+                <p>Your account ({user.primaryEmailAddress?.emailAddress}) is not authorized to access Admin Mode.</p>
+                <button className="submit-btn denied-btn" onClick={() => signOut().then(() => window.location.reload())}>Sign Out / Change Account</button>
+              </div>
+            ) : (
+              <SignIn redirectUrl="/cruz-admin" routing="hash" />
+            )
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '40px 20px' }}>
+              <span className="spinner"></span>
+              <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Loading authentication...</span>
+            </div>
+          )}
+          <a href="/" className="back-to-home-link">← Back to Public Site</a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="indicator"></div>
@@ -1407,6 +1591,22 @@ export default function App() {
           </button>
           <a href="https://github.com/ajf013" target="_blank" rel="noopener noreferrer" className="nav-item">GitHub Profile</a>
           <button id="export-json-btn" onClick={handleExportJSON} className="nav-item-btn" title="Export Added Projects to JSON">Export Config</button>
+          {isAdmin && (
+            <button 
+              id="admin-logout-btn" 
+              onClick={async () => {
+                localStorage.removeItem('cruz_portal_write_sas');
+                setIsAdmin(false);
+                await signOut();
+                alert("Logged out of Admin Mode.");
+                window.location.href = '/';
+              }} 
+              className="nav-item-btn admin-logout" 
+              title="Exit Admin Mode"
+            >
+              Exit Admin
+            </button>
+          )}
           <button id="theme-toggle-btn" onClick={toggleTheme} className="theme-toggle" title="Toggle Light/Dark Theme">
             {theme === 'dark' ? (
               <svg className="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1484,12 +1684,12 @@ export default function App() {
                         Architecture
                       </button>
                     )}
-                    {project.isManual && (
+                    {isAdmin && project.isManual && (
                       <button 
                         className="mobile-delete-btn" 
-                        onClick={(e) => { 
-                          e.stopPropagation(); 
-                          handleDeleteProject(project.id, `${project.title} ${project.title2}`); 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteProject(project.id, `${project.title} ${project.title2}`);
                         }}
                       >
                         Delete
@@ -1558,7 +1758,7 @@ export default function App() {
               Architecture
             </button>
           )}
-          {(displayProject?.isManual || activeProject.isManual) && (
+          {isAdmin && (displayProject?.isManual || activeProject.isManual) && (
             <button 
               className="delete-btn" 
               onClick={() => handleDeleteProject(
@@ -1748,11 +1948,11 @@ export default function App() {
       </div>
 
       {/* Add Project FAB */}
-      {activeTab === 'projects' && (
+      {activeTab === 'projects' && isAdmin && (
         <button 
           className="fab" 
           id="add-project-fab" 
-          onClick={() => { setShowModal(true); isPausedRef.current = true; }} 
+          onClick={() => { setShowModal(true); isPausedRef.current = true; setAiPreviewUrl(''); }} 
           title="Add Project Manually"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -1789,6 +1989,37 @@ export default function App() {
               <label>GitHub Repository URL (Optional)</label>
               <input type="url" value={pRepo} onChange={(e) => setPRepo(e.target.value)} placeholder="https://github.com/ajf013/ATS-Resume-Score-Checker" />
             </div>
+            
+            {/* AI Auto-fill & Background Generator */}
+            <div className="form-group ai-generation-group">
+              <button 
+                type="button" 
+                className="ai-gen-btn"
+                onClick={handleAiBackgroundGeneration}
+                disabled={aiLoading}
+              >
+                {aiLoading ? (
+                  <>
+                    <span className="spinner"></span> Processing with AI...
+                  </>
+                ) : (
+                  <>
+                    <svg className="ai-stars-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21L8.188 15.904L3 15L8.188 14.096L9 9L9.813 14.096L15 15L9.813 15.904ZM19.071 7.071L18 11L16.929 7.071L13 6L16.929 4.929L18 1L19.071 4.929L23 6L19.071 7.071Z" />
+                    </svg>
+                    Auto-Fill Live URL & Background
+                  </>
+                )}
+              </button>
+              {aiPreviewUrl && (
+                <div className="ai-screenshot-preview">
+                  <div className="preview-header">AI-Generated Homepage Background:</div>
+                  <img src={aiPreviewUrl} alt="AI Live Preview" className="preview-img" onError={(e) => { e.target.style.display = 'none'; }} />
+                  <div className="preview-caption">Using Live URL: <code>{pLive}</code></div>
+                </div>
+              )}
+            </div>
+
             <div className="form-group">
               <label>Cover Style</label>
               <div className="cover-options">
@@ -1839,6 +2070,34 @@ export default function App() {
         </div>
         <button className="update-banner-btn" onClick={handleUpdateRefresh}>Update & Refresh</button>
       </div>
+
+      {/* PWA Install Banner */}
+      {showInstallBanner && installPromptEvent && !showUpdate && (
+        <div className="install-banner show">
+          <div className="install-banner-header">
+            <span className="install-badge">App Install</span>
+            <button className="close-btn" onClick={() => setShowInstallBanner(false)}>&times;</button>
+          </div>
+          <div className="install-banner-body">
+            <p>Add CruzOne Portal to your home screen for offline access and faster loading.</p>
+          </div>
+          <button 
+            className="install-banner-btn" 
+            onClick={async () => {
+              if (installPromptEvent) {
+                installPromptEvent.prompt();
+                const { outcome } = await installPromptEvent.userChoice;
+                if (outcome === 'accepted') {
+                  setInstallPromptEvent(null);
+                  setShowInstallBanner(false);
+                }
+              }
+            }}
+          >
+            Install App
+          </button>
+        </div>
+      )}
 
       {/* Architecture Playground Modal */}
       {activeArch && ARCHITECTURES[activeArch] && (

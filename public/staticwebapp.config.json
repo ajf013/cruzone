@@ -1,0 +1,7 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/static/*", "/assets/*", "/public/*", "/favicon.svg", "/manifest.json", "/sw.js", "/version.json", "*.png", "*.jpg", "*.gif"]
+  }
+}
+

@@ -8,11 +8,13 @@ A high-performance, responsive personal projects showcase designed with a premiu
 
 1. **MCT Badge & Certification Showcase**: A visually stunning verified showcase of Microsoft and AWS certifications, complete with tier-colored glassmorphic backlight glows (*Expert*: Purple, *Associate*: Blue, *Fundamentals*: Teal, *AWS*: Orange, *Challenge*: Green) and a golden Microsoft Certified Trainer (MCT) verification banner linked directly to the public [Credly Verification Page](https://www.credly.com/users/fcruz).
 2. **Interactive Azure Architecture Playgrounds**: Immersive, responsive SVG resource maps for key cloud-native projects. Users can click or hover on nodes to see resource descriptions, role definitions, and copy raw HashiCorp Terraform configuration code to their clipboards.
-3. **Serverless NoSQL Database Integration**: Real-time project syncing using Azure Table Storage ($0.00 cost database layer) with read-only operations using SAS tokens compiled client-side, and administrative write/delete CRUD operations.
-4. **Clerk Admin Authentication**: Premium authentication via Clerk utilizing GitHub social sign-in. The admin interface is restricted to a hidden, custom path (`/cruz-admin`) and hidden entirely from public users, granting access only if the logged-in user email matches the configured admin identity (`VITE_ADMIN_EMAIL`).
-5. **AI-Powered Auto-Fill & Screenshot Generator**: An AI-driven service integrated directly into the project creation form. It uses Azure OpenAI (GPT-4o version `2024-11-20`) to analyze project details (title, category, description, and repo) and automatically deduce the live URL. It then uses the Microlink API to take a real-time screenshot of the live site and render it as the card's background.
-6. **Mobile Ergonomics**: Restructured layout stacking project cards vertically on mobile screen widths (< 992px) for normal touch-scrolling, with dedicated mobile footer docks.
-7. **Dynamic PWA Updates**: Fully installable offline app checking and notifying users of version updates dynamically.
+3. **Serverless NoSQL Database & REST Method Tunneling**: Real-time project syncing using Azure Table Storage ($0.00 cost database layer) with read-only SAS tokens compiled client-side. Administrative CRUD operations use **POST HTTP Method Tunneling (`X-HTTP-Method: PUT`)** to bypass browser CORS preflight blocks and perform an **Insert Or Replace Entity** operation, allowing seamless modifications of all projects (baseline and manual).
+4. **Clerk Admin Authentication**: Premium authentication via Clerk utilizing GitHub social sign-in. The admin interface is restricted to a hidden, custom path (`/cruz-admin`) and hidden entirely from public users, granting access only if the logged-in user email matches the whitelisted administrator identity (`VITE_ADMIN_EMAIL`).
+5. **Project Modification & Deletion Control Panels**: Administrative control actions allow editing and deleting all projects (both manually added projects and pre-packaged baseline templates). Baseline template modifications are uploaded to the database and override the defaults automatically, while deletions are tracked via a client-side blacklist cache.
+6. **AI-Powered Auto-Fill & Screenshot Generator**: An AI-driven service integrated directly into the project creation and edit forms. It uses Azure OpenAI (GPT-4o version `2024-11-20`) to analyze project details (title, category, description, and repo) and automatically deduce the live URL. It then uses the Microlink API to take a real-time screenshot of the live site and render it as the card's background.
+7. **Responsive Scrollable Modals**: Modals are configured with a viewport-dependent height limit (`max-height: 90vh`) and custom-designed vertical scrollbars, preventing screen overflow and ensuring full scrollability on laptops and smaller displays.
+8. **Mobile Ergonomics**: Restructured layout stacking project cards vertically on mobile screen widths (< 992px) for normal touch-scrolling, with dedicated mobile footer docks.
+9. **Dynamic PWA Updates**: Fully installable offline app checking and notifying users of version updates dynamically.
 
 ---
 
@@ -110,6 +112,13 @@ graph TD
 - The AI analyzes the details, deduces the correct subdomain configuration on `fcruz.org` (e.g., `https://atsscore.fcruz.org` or `https://sticky-notes.fcruz.org`), and responds.
 - The deduced live URL is populated in the form, and a screenshot preview fetch request is triggered via the Microlink screenshot API.
 - Upon saving, the project data is pushed to Azure Table Storage via the administrative write SAS token (`VITE_WRITE_SAS`).
+
+### 4. Project Update (Editing) & Method Tunneling Flow
+- The Administrator clicks the **Edit** (pencil icon) button on any project (including baseline projects).
+- The modal form opens pre-populated with all existing metadata, URLs, and cover style selections.
+- Saving the form sends a `POST` request to the specific RowKey endpoint (`PartitionKey='project', RowKey='projectId'`).
+- The request includes the `X-HTTP-Method: PUT` header to tunnel a REST `PUT` request through `POST`. This bypasses browser CORS restrictions on `PUT`/`MERGE` verbs.
+- Because no `If-Match` header is supplied, Azure Table Storage runs an **Insert Or Replace Entity** operation. This creates a new record for baseline projects (overriding the defaults on subsequent fetches) or replaces existing custom ones.
 
 ---
 

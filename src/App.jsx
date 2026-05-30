@@ -1427,14 +1427,19 @@ export default function App() {
         ? `${AZURE_TABLE_URL}(PartitionKey='project',RowKey='${projectId}')${writeSas}`
         : `${AZURE_TABLE_URL}${writeSas}`;
       
-      const method = isEdit ? 'PUT' : 'POST';
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json;odata=nometadata'
+      };
+
+      if (isEdit) {
+        headers['X-HTTP-Method'] = 'PUT'; // Tunnel PUT through POST to bypass CORS PUT limitations
+        headers['If-Match'] = '*';
+      }
 
       const res = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json;odata=nometadata'
-        },
+        method: 'POST',
+        headers: headers,
         body: JSON.stringify(newEntity)
       });
 

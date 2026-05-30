@@ -622,6 +622,7 @@ export default function App() {
   
   // Modals state
   const [showModal, setShowModal] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
   const [showUpdate, setShowUpdate] = useState(false);
   const [changelog, setChangelog] = useState([]);
   const [serverVersion, setServerVersion] = useState('');
@@ -1181,10 +1182,21 @@ export default function App() {
         manual = loadManual();
       }
 
-      const merged = [...manual, ...BASELINE_PROJECTS];
+      // Filter out deleted and overridden baselines
+      const deletedBaselines = JSON.parse(localStorage.getItem('cruz_portal_deleted_baselines') || '[]');
+      const filteredBaselines = BASELINE_PROJECTS.filter(b => {
+        if (deletedBaselines.includes(b.id)) return false;
+        const isOverridden = manual.some(m => m.id === b.id);
+        return !isOverridden;
+      });
+
+      const merged = [...manual, ...filteredBaselines];
       setProjects(merged);
       setOrder(Array.from({ length: merged.length }, (_, i) => i));
       setActiveIdxState(0);
+      if (merged.length > 0) {
+        setDisplayProject(merged[0]);
+      }
 
       // Theme
       const savedTheme = localStorage.getItem('cruz_portal_theme') || 'dark';
@@ -1377,7 +1389,7 @@ export default function App() {
     }
   };
 
-  // Add project submit
+  // Add or Edit project submit
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!pTitle.trim() || !pCategory.trim() || !pDesc.trim()) return;
@@ -1394,7 +1406,9 @@ export default function App() {
     const title1 = words.slice(0, 2).join(" ") || "PROJECT";
     const title2 = words.slice(2).join(" ") || "DETAILS";
 
-    const projectId = `manual-${Date.now()}`;
+    const isEdit = !!editingProject;
+    const projectId = isEdit ? editingProject.id : `manual-${Date.now()}`;
+    
     const newEntity = {
       PartitionKey: 'project',
       RowKey: projectId,
@@ -1409,8 +1423,14 @@ export default function App() {
     };
 
     try {
-      const res = await fetch(`${AZURE_TABLE_URL}${writeSas}`, {
-        method: 'POST',
+      const url = isEdit 
+        ? `${AZURE_TABLE_URL}(PartitionKey='project',RowKey='${projectId}')${writeSas}`
+        : `${AZURE_TABLE_URL}${writeSas}`;
+      
+      const method = isEdit ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json;odata=nometadata'
@@ -1429,7 +1449,7 @@ export default function App() {
       }
 
       // Add to local projects state & update localStorage cache
-      const newProject = {
+      const savedProject = {
         id: projectId,
         place: pCategory,
         title: title1,
@@ -1441,15 +1461,50 @@ export default function App() {
         isManual: true
       };
 
-      const manual = loadManual();
-      manual.unshift(newProject);
-      localStorage.setItem('cruz_portal_manual_projects', JSON.stringify(manual));
+      let manual = loadManual();
+      if (isEdit) {
+        // Update or insert manual cache
+        const exists = manual.some(p => p.id === projectId);
+        if (exists) {
+          manual = manual.map(p => p.id === projectId ? savedProject : p);
+        } else {
+          manual.unshift(savedProject);
+        }
+        localStorage.setItem('cruz_portal_manual_projects', JSON.stringify(manual));
 
-      const newProjects = [newProject, ...projects];
-      setProjects(newProjects);
+        // If it was baseline, check if it was in deleted baselines list
+        const deletedBaselines = JSON.parse(localStorage.getItem('cruz_portal_deleted_baselines') || '[]');
+        if (deletedBaselines.includes(projectId)) {
+          const updatedDeleted = deletedBaselines.filter(id => id !== projectId);
+          localStorage.setItem('cruz_portal_deleted_baselines', JSON.stringify(updatedDeleted));
+        }
+
+        // Update projects state
+        const updatedProjects = projects.map(p => p.id === projectId ? savedProject : p);
+        setProjects(updatedProjects);
+        
+        if (displayProject && displayProject.id === projectId) {
+          setDisplayProject(savedProject);
+        }
+
+        alert("Project successfully updated!");
+      } else {
+        manual.unshift(savedProject);
+        localStorage.setItem('cruz_portal_manual_projects', JSON.stringify(manual));
+
+        const newProjects = [savedProject, ...projects];
+        setProjects(newProjects);
+        
+        // Reset carousel showing the newly added index 0
+        setOrder(Array.from({ length: newProjects.length }, (_, i) => i));
+        setActiveIdxState(0);
+        setDisplayProject(savedProject);
+        alert("Project successfully added!");
+      }
 
       // Close modal & reset form
       setShowModal(false);
+      setEditingProject(null);
       setPTitle('');
       setPCategory('');
       setPDesc('');
@@ -1459,20 +1514,38 @@ export default function App() {
       setPCustomImage('');
       setAiPreviewUrl('');
       isPausedRef.current = false;
-
-      // Reset carousel showing the newly added index 0
-      setOrder(Array.from({ length: newProjects.length }, (_, i) => i));
-      setActiveIdxState(0);
-      alert("Project successfully added to the Azure Table database!");
     } catch (err) {
       console.error(err);
-      alert("Failed to save project to Azure cloud database: " + err.message);
+      alert("Failed to save project: " + err.message);
     }
   };
 
-  // Delete manual project
+  // Edit project click handler
+  const handleEditProjectClick = (project) => {
+    setEditingProject(project);
+    setPTitle(project.title + (project.title2 ? " " + project.title2 : ""));
+    setPCategory(project.place);
+    setPDesc(project.description);
+    setPLive(project.liveUrl || '');
+    setPRepo(project.repoUrl || '');
+    
+    const gradients = ['gradient-deep-blue', 'gradient-sunset', 'gradient-green', 'gradient-gold', 'gradient-purple'];
+    if (gradients.includes(project.image)) {
+      setCoverStyle(project.image);
+      setPCustomImage('');
+    } else {
+      setCoverStyle('custom');
+      setPCustomImage(project.image || '');
+    }
+    
+    setAiPreviewUrl(project.image && !project.image.startsWith('gradient-') && !project.image.startsWith('./') ? project.image : '');
+    isPausedRef.current = true;
+    setShowModal(true);
+  };
+
+  // Delete manual or baseline project
   const handleDeleteProject = async (projId, title) => {
-    if (window.confirm(`Are you sure you want to delete "${title}" from the cloud database?`)) {
+    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
       const writeSas = getWriteSas();
       if (!writeSas) return;
 
@@ -1486,7 +1559,8 @@ export default function App() {
           }
         });
 
-        if (!res.ok) {
+        // 404 is allowed (e.g. deleting a baseline project that doesn't exist on the cloud yet)
+        if (!res.ok && res.status !== 404) {
           if (res.status === 403 || res.status === 401 || res.status === 400) {
             localStorage.removeItem('cruz_portal_write_sas');
             setIsAdmin(false);
@@ -1501,14 +1575,31 @@ export default function App() {
         manual = manual.filter(p => p.id !== projId);
         localStorage.setItem('cruz_portal_manual_projects', JSON.stringify(manual));
 
+        // Track deleted baselines in localStorage
+        if (projId.startsWith('baseline-') || !manual.some(p => p.id === projId)) {
+          const deletedBaselines = JSON.parse(localStorage.getItem('cruz_portal_deleted_baselines') || '[]');
+          if (!deletedBaselines.includes(projId)) {
+            deletedBaselines.push(projId);
+            localStorage.setItem('cruz_portal_deleted_baselines', JSON.stringify(deletedBaselines));
+          }
+        }
+
         const newProjects = projects.filter(p => p.id !== projId);
         setProjects(newProjects);
         setOrder(Array.from({ length: newProjects.length }, (_, i) => i));
+        
+        // Reset active idx & update display project
         setActiveIdxState(0);
-        alert("Project successfully deleted from the Azure Table database!");
+        if (newProjects.length > 0) {
+          setDisplayProject(newProjects[0]);
+        } else {
+          setDisplayProject(null);
+        }
+
+        alert("Project successfully deleted!");
       } catch (err) {
         console.error(err);
-        alert("Failed to delete project from Azure cloud database: " + err.message);
+        alert("Failed to delete project: " + err.message);
       }
     }
   };
@@ -1704,16 +1795,27 @@ export default function App() {
                         Architecture
                       </button>
                     )}
-                    {isAdmin && project.isManual && (
-                      <button 
-                        className="mobile-delete-btn" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteProject(project.id, `${project.title} ${project.title2}`);
-                        }}
-                      >
-                        Delete
-                      </button>
+                    {isAdmin && (
+                      <>
+                        <button 
+                          className="mobile-edit-btn" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditProjectClick(project);
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          className="mobile-delete-btn" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteProject(project.id, `${project.title} ${project.title2}`);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -1778,19 +1880,30 @@ export default function App() {
               Architecture
             </button>
           )}
-          {isAdmin && (displayProject?.isManual || activeProject.isManual) && (
-            <button 
-              className="delete-btn" 
-              onClick={() => handleDeleteProject(
-                displayProject?.id || activeProject.id, 
-                `${displayProject?.title || activeProject.title} ${displayProject?.title2 || activeProject.title2}`
-              )} 
-              title="Delete Project"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-              </svg>
-            </button>
+          {isAdmin && (
+            <>
+              <button 
+                className="edit-btn" 
+                onClick={() => handleEditProjectClick(displayProject || activeProject)} 
+                title="Edit Project"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                </svg>
+              </button>
+              <button 
+                className="delete-btn" 
+                onClick={() => handleDeleteProject(
+                  displayProject?.id || activeProject.id, 
+                  `${displayProject?.title || activeProject.title} ${displayProject?.title2 || activeProject.title2}`
+                )} 
+                title="Delete Project"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                </svg>
+              </button>
+            </>
           )}
         </div>
 
@@ -1972,7 +2085,19 @@ export default function App() {
         <button 
           className="fab" 
           id="add-project-fab" 
-          onClick={() => { setShowModal(true); isPausedRef.current = true; setAiPreviewUrl(''); }} 
+          onClick={() => {
+            setEditingProject(null);
+            setPTitle('');
+            setPCategory('');
+            setPDesc('');
+            setPLive('');
+            setPRepo('');
+            setCoverStyle('gradient-deep-blue');
+            setPCustomImage('');
+            setAiPreviewUrl('');
+            isPausedRef.current = true;
+            setShowModal(true);
+          }} 
           title="Add Project Manually"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -1985,7 +2110,7 @@ export default function App() {
       <div className={`modal ${showModal ? 'show' : ''}`} onClick={(e) => { if (e.target.classList.contains('modal')) { setShowModal(false); isPausedRef.current = false; } }}>
         <div className="modal-content">
           <div className="modal-header">
-            <h2>Add New Project</h2>
+            <h2>{editingProject ? 'Edit Project' : 'Add New Project'}</h2>
             <button className="close-btn" onClick={() => { setShowModal(false); isPausedRef.current = false; }}>&times;</button>
           </div>
           <form id="project-form" onSubmit={handleFormSubmit}>

@@ -1434,7 +1434,6 @@ export default function App() {
 
       if (isEdit) {
         headers['X-HTTP-Method'] = 'PUT'; // Tunnel PUT through POST to bypass CORS PUT limitations
-        headers['If-Match'] = '*';
       }
 
       const res = await fetch(url, {

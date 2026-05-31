@@ -3,6 +3,9 @@ import gsap from 'gsap';
 import { useUser, useClerk, SignIn } from '@clerk/clerk-react';
 import { deduceLiveUrl, getScreenshotUrl } from './services/aiService';
 
+const AZURE_TABLE_URL = import.meta.env.VITE_AZURE_TABLE_URL;
+const READ_SAS = import.meta.env.VITE_READ_SAS;
+
 // Baseline projects mapping to real GitHub profile ajf013
 const BASELINE_PROJECTS = [
   {

@@ -1452,14 +1452,16 @@ body.light-theme .pagination > .arrow:hover {
 
 @media (max-width: 768px) {
   nav {
-    padding: 16px 24px;
+    padding: 16px 16px;
   }
   nav .brand-text {
-    font-size: 16px;
+    display: none; /* Hide brand text to make room for all links */
   }
-  nav .nav-links > .nav-item,
+  nav .nav-links {
+    gap: 14px; /* Reduce gap on mobile to fit elements */
+  }
   nav .nav-links > .nav-item-btn {
-    display: none; /* Hide profile link and buttons on mobile to make room */
+    display: none; /* Hide action buttons to avoid overflow */
   }
   
   #demo {

@@ -1745,7 +1745,9 @@ export default function App() {
       }
     } catch(e) {}
 
-    window.location.reload(true);
+    // Perform cache-busting hard reload to force clean asset download
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.location.href = `${cleanUrl}?update=${Date.now()}`;
   };
 
   // Initial Loading

@@ -43,15 +43,24 @@ self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
+  const requestUrl = new URL(event.request.url);
+  const isSameOrigin = requestUrl.origin === self.location.origin;
+
   // Always fetch version.json directly from the network to ensure update checks work immediately
-  if (event.request.url.includes('version.json')) {
+  if (requestUrl.pathname.endsWith('version.json') || event.request.url.includes('version.json')) {
     event.respondWith(
       fetch(event.request).catch(() => caches.match(event.request))
     );
     return;
   }
 
-  // Handle caching of app shell & dynamic assets
+  // Do NOT intercept or cache external API / database requests (e.g. Azure Table Storage, GitHub API)
+  if (!isSameOrigin) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // Handle caching of app shell & dynamic assets (same origin only)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {

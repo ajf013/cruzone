@@ -15,6 +15,9 @@ A high-performance, responsive personal projects showcase designed with a premiu
 7. **Responsive Scrollable Modals**: Modals are configured with a viewport-dependent height limit (`max-height: 90vh`) and custom-designed vertical scrollbars, preventing screen overflow and ensuring full scrollability on laptops and smaller displays.
 8. **Mobile Ergonomics**: Restructured layout stacking project cards vertically on mobile screen widths (< 992px) for normal touch-scrolling, with dedicated mobile footer docks.
 9. **Dynamic PWA Updates**: Fully installable offline app checking and notifying users of version updates dynamically.
+10. **Advanced Native Markdown-to-React Parser**: Custom secure parser that translates GitHub README files (including lists, blockquotes, markdown tables, linked/unlinked image assets, links, inline code, bold, and italics) into native React JSX nodes, eliminating any dependence on unsafe HTML renderers.
+11. **Dynamic Section Filtering & Segment Extraction**: Integrates preprocessing segment filters to dynamically extract and display only the essential sections of the user's GitHub profile README (Typing Header, About Me details, and Focused Goals list) to ensure a clean, unified showcase tab.
+12. **MCT & Certification Verification**: Unified public credential verification routing all badge links and card verifications directly to the verified public [Credly Repository Profile](https://www.credly.com/users/fcruz).
 
 ---
 

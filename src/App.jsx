@@ -115,6 +115,100 @@ const BASELINE_PROJECTS = [
   }
 ];
 
+const FALLBACK_GITHUB_PROFILE = {
+  avatar_url: "https://avatars.githubusercontent.com/u/74620353?v=4",
+  name: "Francis Ponnu Cruz I",
+  login: "ajf013",
+  bio: "Microsoft Certified Trainer (MCT) | Solutions Architect Expert | Specialized in Azure, React, Node.js & AI integrations.",
+  location: "Sydney, Australia",
+  company: "CruzOne Solutions",
+  blog: "https://fcruz.org",
+  public_repos: 28,
+  followers: 142,
+  following: 86,
+  created_at: "2020-11-16T12:00:00Z"
+};
+
+const FALLBACK_GITHUB_REPOS = [
+  {
+    name: "ATS-Resume-Score-Checker",
+    description: "Analyze your resume for ATS compatibility, skill gaps & get actionable improvement suggestions — powered by Azure AI.",
+    language: "JavaScript",
+    stargazers_count: 32,
+    forks_count: 8,
+    html_url: "https://github.com/ajf013/ATS-Resume-Score-Checker"
+  },
+  {
+    name: "CloudSentry",
+    description: "AI-powered security scanner for Azure subscriptions. Provides cloud node maps, threat monitoring alerts, and compliance auditing checks.",
+    language: "JavaScript",
+    stargazers_count: 24,
+    forks_count: 5,
+    html_url: "https://github.com/ajf013/CloudSentry"
+  },
+  {
+    name: "Azure-Financial-Insights",
+    description: "Cloud spend management dashboard with glassmorphism UI. Integrates real-time budget enforcement and cloud cost calculations.",
+    language: "CSS",
+    stargazers_count: 18,
+    forks_count: 3,
+    html_url: "https://github.com/ajf013/Azure-Financial-Insights"
+  },
+  {
+    name: "CruzOps-AI",
+    description: "ChatGPT-like conversational scripting assistant for Azure. Generates administration scripts via conversational AI.",
+    language: "JavaScript",
+    stargazers_count: 15,
+    forks_count: 2,
+    html_url: "https://github.com/ajf013/CruzOps-AI"
+  }
+];
+
+const FALLBACK_GITHUB_README = `
+<div align="center">
+<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=28&pause=1000&color=0078D4&center=true&vCenter=true&width=700&lines=Hi+there%2C+I'm+Francis+Cruz+%F0%9F%91%8B;Azure+Cloud+%26+DevOps+Engineer+%E2%98%81%EF%B8%8F;Microsoft+Certified+Trainer+(MCT)+%F0%9F%8E%93;Building+Secure+%26+Scalable+Cloud+Solutions" alt="Typing SVG" /></a>
+ 
+<br/>
+<a href="https://github.com/ajf013?tab=repositories"><img src="https://img.shields.io/badge/dynamic/json?color=0078D4&label=Repositories&query=%24.public_repos&url=https%3A%2F%2Fapi.github.com%2Fusers%2Fajf013&logo=github&logoColor=white&style=flat" alt="GitHub Repositories" /></a>
+&nbsp;
+<img src="https://img.shields.io/badge/Joined-2020%20(%7E6%20Years)-0078D4?style=flat&logo=github&logoColor=white" alt="Joined GitHub" />
+&nbsp;
+<img src="https://komarev.com/ghpvc/?username=ajf013&label=Profile%20Views&color=0078D4&style=flat" alt="Profile Views" />
+&nbsp;
+<a href="https://github.com/ajf013"><img src="https://img.shields.io/github/followers/ajf013?label=Followers&style=flat&color=0078D4" alt="GitHub followers" /></a>
+&nbsp;
+<a href="https://www.linkedin.com/in/ajf013-francis-cruz/"><img src="https://img.shields.io/badge/LinkedIn-Connect-0078D4?style=flat&logo=linkedin" alt="LinkedIn" /></a>
+</div>
+
+---
+
+## 💁 About Me
+
+\`\`\`yaml
+Name:        Francis Ponnu Cruz I
+Title:       Azure Cloud & DevOps Engineer | Microsoft Certified Trainer (MCT)
+Company:     Wipro
+Location:    Coimbatore, Tamil Nadu, India
+Education:
+  - M.Tech in Computing Systems & Infrastructure — BITS Pilani (Wipro WILP, 2025)
+  - BCA — KG College of Arts & Science, Bharathiar University (2021)
+Focus:       Cloud Architecture · DevOps · Security · Automation · SRE
+Status:      🟢 Open to new opportunities
+\`\`\`
+
+I'm a results-driven Azure Cloud & DevOps Engineer with **4+ years** of experience designing, automating, and securing enterprise-scale cloud infrastructure. I specialize in Infrastructure as Code, CI/CD pipelines, cloud governance, and AI-powered cloud solutions. I enjoy turning complex cloud challenges into clean, automated, and cost-efficient architectures.
+
+---
+
+## 🎯 What I'm Currently Focused On
+
+- 🏗️ Deepening expertise in **Cloud Solutions Architecture** (working toward AZ-305 real-world projects)
+- 🔁 Expanding **DevOps & SRE** practices — GitOps, observability, and reliability engineering
+- 🤖 Exploring **Azure AI Services** and building intelligent cloud-native applications
+- 📖 Upskilling in **FinOps** and cloud cost governance at scale
+- 🌐 **Open to new roles** in Azure Cloud, DevOps, and Cloud Architecture
+`;
+
 const CERTIFICATIONS = [
   {
     id: "mct",
@@ -593,8 +687,466 @@ const ARCHITECTURES = {
   }
 };
 
-const AZURE_TABLE_URL = import.meta.env.VITE_AZURE_TABLE_URL || "";
-const READ_SAS = import.meta.env.VITE_READ_SAS || "";
+const parseInlineMarkdown = (text) => {
+  if (!text) return '';
+  
+  // Regex to match:
+  // 1. Linked image: [![alt](img_src)](url)
+  // 2. Plain image: ![alt](img_src)
+  // 3. Link: [text](url)
+  // 4. Bold: **text**
+  // 5. Italic: *text*
+  // 6. Inline code: `code`
+  const tokenRegex = /(\[!\[[^\]]*\]\([^)]*\)\]\([^)]*\)|!\[[^\]]*\]\([^)]*\)|\[[^\]]*\]\([^)]*\)|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+  
+  const parts = text.split(tokenRegex);
+  return parts.map((part, idx) => {
+    if (!part) return null;
+    
+    // Check linked image: [![alt](img_src)](url)
+    const linkedImgMatch = /^\[\!\[([^\]]*)\]\(([^)]*)\)\]\(([^)]*)\)$/.exec(part);
+    if (linkedImgMatch) {
+      const alt = linkedImgMatch[1];
+      const img_src = linkedImgMatch[2];
+      const url = linkedImgMatch[3];
+      return (
+        <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="readme-link">
+          <img src={img_src} alt={alt} className="readme-badge-inline" />
+        </a>
+      );
+    }
+    
+    // Check plain image: ![alt](img_src)
+    const imgMatch = /^!\[([^\]]*)\]\(([^)]*)\)$/.exec(part);
+    if (imgMatch) {
+      const alt = imgMatch[1];
+      const img_src = imgMatch[2];
+      const isTyping = img_src.includes('typing-svg');
+      return (
+        <img 
+          key={idx} 
+          src={img_src} 
+          alt={alt} 
+          className={isTyping ? "readme-typing-svg" : "readme-badge-inline"} 
+        />
+      );
+    }
+    
+    // Check link: [text](url)
+    const linkMatch = /^\[([^\]]*)\]\(([^)]*)\)$/.exec(part);
+    if (linkMatch) {
+      const textVal = linkMatch[1];
+      const url = linkMatch[2];
+      return (
+        <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="readme-link">
+          {parseInlineMarkdown(textVal)}
+        </a>
+      );
+    }
+    
+    // Check bold: **text**
+    if (part.startsWith('**') && part.endsWith('**')) {
+      const boldText = part.slice(2, -2);
+      return <strong key={idx}>{parseInlineMarkdown(boldText)}</strong>;
+    }
+    
+    // Check italic: *text*
+    if (part.startsWith('*') && part.endsWith('*')) {
+      const italicText = part.slice(1, -1);
+      return <em key={idx}>{parseInlineMarkdown(italicText)}</em>;
+    }
+    
+    // Check inline code: `code`
+    if (part.startsWith('`') && part.endsWith('`')) {
+      const codeText = part.slice(1, -1);
+      return <code key={idx} className="readme-inline-code">{codeText}</code>;
+    }
+    
+    // Fallback plain text
+    return part;
+  });
+};
+
+const filterReadmeSections = (markdown) => {
+  if (!markdown) return '';
+  const lines = markdown.split('\n');
+  
+  const headerLines = [];
+  const aboutLines = [];
+  const focusLines = [];
+  
+  let section = 'header';
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const cleanLine = line.trim();
+    
+    if (cleanLine.startsWith('## ') || cleanLine.startsWith('### ')) {
+      const headingText = cleanLine.toLowerCase();
+      if (headingText.includes('about')) {
+        section = 'about';
+      } else if (headingText.includes('focused') || headingText.includes('focus')) {
+        section = 'focus';
+      } else {
+        section = 'ignored';
+      }
+    }
+    
+    if (cleanLine === '---') {
+      continue;
+    }
+    
+    if (section === 'header') {
+      headerLines.push(line);
+    } else if (section === 'about') {
+      aboutLines.push(line);
+    } else if (section === 'focus') {
+      focusLines.push(line);
+    }
+  }
+  
+  const cleanSectionLines = (secLines) => {
+    let start = 0;
+    while (start < secLines.length && !secLines[start].trim()) {
+      start++;
+    }
+    let end = secLines.length - 1;
+    while (end >= start && !secLines[end].trim()) {
+      end--;
+    }
+    return secLines.slice(start, end + 1);
+  };
+  
+  const cleanHeader = cleanSectionLines(headerLines);
+  const cleanAbout = cleanSectionLines(aboutLines);
+  const cleanFocus = cleanSectionLines(focusLines);
+  
+  const result = [];
+  result.push(...cleanHeader);
+  if (cleanAbout.length > 0) {
+    result.push('', '---', '');
+    result.push(...cleanAbout);
+  }
+  if (cleanFocus.length > 0) {
+    result.push('', '---', '');
+    result.push(...cleanFocus);
+  }
+  
+  return result.join('\n');
+};
+
+const renderMarkdown = (markdown) => {
+  if (!markdown) return null;
+  
+  const cleanMarkdown = filterReadmeSections(markdown);
+  const lines = cleanMarkdown.split('\n');
+  const html = [];
+  
+  let inYaml = false;
+  let yamlLines = [];
+  let inCode = false;
+  let codeLines = [];
+  let codeLang = '';
+  
+  let currentList = null; // 'ul' or 'ol'
+  let listItems = [];
+  
+  let inBlockquote = false;
+  let blockquoteLines = [];
+  
+  let inTable = false;
+  let tableHeader = null;
+  let tableRows = [];
+  let tableAlignments = [];
+
+  // Helper to flush current open block elements
+  const flushBlocks = (keyPrefix) => {
+    if (currentList) {
+      const ListTag = currentList;
+      html.push(
+        <ListTag key={`${keyPrefix}-list`} className={`readme-${currentList}`}>
+          {listItems.map((item, idx) => (
+            <li key={idx}>{parseInlineMarkdown(item)}</li>
+          ))}
+        </ListTag>
+      );
+      currentList = null;
+      listItems = [];
+    }
+    
+    if (inBlockquote) {
+      html.push(
+        <blockquote key={`${keyPrefix}-blockquote`} className="readme-blockquote">
+          {blockquoteLines.map((lineText, idx) => (
+            <p key={idx}>{parseInlineMarkdown(lineText)}</p>
+          ))}
+        </blockquote>
+      );
+      inBlockquote = false;
+      blockquoteLines = [];
+    }
+    
+    if (inTable) {
+      if (tableHeader) {
+        html.push(
+          <div key={`${keyPrefix}-table-container`} className="readme-table-container">
+            <table className="readme-table">
+              <thead>
+                <tr>
+                  {tableHeader.map((cell, idx) => {
+                    const align = tableAlignments[idx] || 'left';
+                    return <th key={idx} style={{ textAlign: align }}>{parseInlineMarkdown(cell)}</th>;
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {tableRows.map((row, rIdx) => (
+                  <tr key={rIdx}>
+                    {row.map((cell, cIdx) => {
+                      const align = tableAlignments[cIdx] || 'left';
+                      return <td key={cIdx} style={{ textAlign: align }}>{parseInlineMarkdown(cell)}</td>;
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      }
+      inTable = false;
+      tableHeader = null;
+      tableRows = [];
+      tableAlignments = [];
+    }
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const cleanLine = line.replace(/<!--[\s\S]*?-->/g, '').trim();
+    
+    // Code block check
+    if (cleanLine.startsWith('```')) {
+      flushBlocks(`code-pre-${i}`);
+      if (inCode || inYaml) {
+        if (inYaml) {
+          html.push(
+            <pre key={`yaml-${i}`} className="readme-yaml">
+              <code>{yamlLines.join('\n')}</code>
+            </pre>
+          );
+          inYaml = false;
+          yamlLines = [];
+        } else {
+          html.push(
+            <pre key={`code-${i}`} className="readme-code">
+              <div className="readme-code-header">
+                <span className="readme-code-lang">{codeLang || 'text'}</span>
+              </div>
+              <code>{codeLines.join('\n')}</code>
+            </pre>
+          );
+          inCode = false;
+          codeLines = [];
+        }
+      } else {
+        const lang = cleanLine.substring(3).trim();
+        if (lang === 'yaml') {
+          inYaml = true;
+        } else {
+          inCode = true;
+          codeLang = lang;
+        }
+      }
+      continue;
+    }
+    
+    if (inYaml) {
+      yamlLines.push(line);
+      continue;
+    }
+    
+    if (inCode) {
+      codeLines.push(line);
+      continue;
+    }
+    
+    // If line is empty or just contains HTML comment leftovers
+    if (!cleanLine) {
+      flushBlocks(`empty-${i}`);
+      continue;
+    }
+    
+    // Handle HTML breaks
+    if (cleanLine === '<br>' || cleanLine === '<br />' || cleanLine === '<br >' || cleanLine === '<br/>') {
+      flushBlocks(`br-${i}`);
+      html.push(<br key={`br-${i}`} />);
+      continue;
+    }
+    
+    // Blockquote check
+    if (cleanLine.startsWith('>')) {
+      flushBlocks(`bq-pre-${i}`);
+      inBlockquote = true;
+      const quoteText = cleanLine.substring(1).trim();
+      blockquoteLines.push(quoteText);
+      continue;
+    }
+    
+    // Table check
+    if (cleanLine.startsWith('|')) {
+      if (!inTable) {
+        flushBlocks(`table-pre-${i}`);
+        inTable = true;
+      }
+      
+      const cells = cleanLine
+        .split('|')
+        .map(c => c.trim())
+        .filter((_, idx, arr) => idx > 0 && idx < arr.length - 1);
+        
+      if (!tableHeader) {
+        tableHeader = cells;
+      } else if (cleanLine.includes('---') || cleanLine.includes('-:')) {
+        tableAlignments = cells.map(cell => {
+          const left = cell.startsWith(':');
+          const right = cell.endsWith(':');
+          if (left && right) return 'center';
+          if (right) return 'right';
+          return 'left';
+        });
+      } else {
+        tableRows.push(cells);
+      }
+      continue;
+    }
+    
+    // List item check: Unordered List
+    if (cleanLine.startsWith('- ') || cleanLine.startsWith('* ')) {
+      if (currentList !== 'ul') {
+        flushBlocks(`list-pre-ul-${i}`);
+        currentList = 'ul';
+      }
+      listItems.push(cleanLine.substring(2).trim());
+      continue;
+    }
+    
+    // List item check: Ordered List
+    const olMatch = /^(\d+)\.\s+(.*)$/.exec(cleanLine);
+    if (olMatch) {
+      if (currentList !== 'ol') {
+        flushBlocks(`list-pre-ol-${i}`);
+        currentList = 'ol';
+      }
+      listItems.push(olMatch[2].trim());
+      continue;
+    }
+    
+    // Flush blocks on normal lines
+    flushBlocks(`std-pre-${i}`);
+    
+    // Handle HTML Center Blocks & Images
+    if (cleanLine.startsWith('<div align="center">') || cleanLine.startsWith('</div>') || cleanLine.startsWith('<div') || cleanLine.includes('align="center"')) {
+      const imgRegex = /<img[^>]*src="([^"]*)"[^>]*alt="([^"]*)"[^>]*\/?>/g;
+      const mdImgRegex = /!\[([^\]]*)\]\(([^)]*)\)/g;
+      const images = [];
+      
+      let innerText = cleanLine;
+      while (i + 1 < lines.length && !lines[i + 1].includes('</div>') && !lines[i + 1].startsWith('##') && !lines[i + 1].startsWith('---')) {
+        i++;
+        innerText += '\n' + lines[i].replace(/<!--[\s\S]*?-->/g, '');
+      }
+      if (i + 1 < lines.length && lines[i + 1].includes('</div>')) {
+        i++;
+        innerText += '\n' + lines[i].replace(/<!--[\s\S]*?-->/g, '');
+      }
+      
+      let imgMatch;
+      while ((imgMatch = imgRegex.exec(innerText)) !== null) {
+        images.push({ src: imgMatch[1], alt: imgMatch[2] || 'badge' });
+      }
+      
+      let mdMatch;
+      while ((mdMatch = mdImgRegex.exec(innerText)) !== null) {
+        images.push({ src: mdMatch[2], alt: mdMatch[1] });
+      }
+      
+      if (images.length > 0) {
+        html.push(
+          <div key={`center-${i}`} className="readme-center-block">
+            {images.map((img, idx) => {
+              const isTyping = img.src.includes('typing-svg');
+              return (
+                <img 
+                  key={idx} 
+                  src={img.src} 
+                  alt={img.alt} 
+                  className={isTyping ? "readme-typing-svg" : "readme-badge"} 
+                />
+              );
+            })}
+          </div>
+        );
+      }
+      continue;
+    }
+    
+    // Headers (H1 - H6)
+    if (cleanLine.startsWith('# ')) {
+      html.push(<h1 key={`h1-${i}`} className="readme-h1">{parseInlineMarkdown(cleanLine.substring(2))}</h1>);
+      continue;
+    }
+    if (cleanLine.startsWith('## ')) {
+      html.push(<h2 key={`h2-${i}`} className="readme-h2">{parseInlineMarkdown(cleanLine.substring(3))}</h2>);
+      continue;
+    }
+    if (cleanLine.startsWith('### ')) {
+      html.push(<h3 key={`h3-${i}`} className="readme-h3">{parseInlineMarkdown(cleanLine.substring(4))}</h3>);
+      continue;
+    }
+    if (cleanLine.startsWith('#### ')) {
+      html.push(<h4 key={`h4-${i}`} className="readme-h4">{parseInlineMarkdown(cleanLine.substring(5))}</h4>);
+      continue;
+    }
+    if (cleanLine.startsWith('##### ')) {
+      html.push(<h5 key={`h5-${i}`} className="readme-h5">{parseInlineMarkdown(cleanLine.substring(6))}</h5>);
+      continue;
+    }
+    if (cleanLine.startsWith('###### ')) {
+      html.push(<h6 key={`h6-${i}`} className="readme-h6">{parseInlineMarkdown(cleanLine.substring(7))}</h6>);
+      continue;
+    }
+    
+    // Dividers
+    if (cleanLine === '---') {
+      html.push(<hr key={`hr-${i}`} className="readme-hr" />);
+      continue;
+    }
+    
+    // Markdown image badges
+    if (cleanLine.startsWith('![') || cleanLine.includes('![')) {
+      const mdImgRegex = /!\[([^\]]*)\]\(([^)]*)\)/g;
+      const badges = [];
+      let match;
+      
+      while ((match = mdImgRegex.exec(cleanLine)) !== null) {
+        badges.push(<img key={match[2]} src={match[2]} alt={match[1]} className="readme-badge-inline" />);
+      }
+      
+      if (badges.length > 0) {
+        html.push(<div key={`badges-${i}`} className="readme-badge-container">{badges}</div>);
+        continue;
+      }
+    }
+    
+    // Standard paragraph
+    html.push(<p key={`p-${i}`} className="readme-paragraph">{parseInlineMarkdown(cleanLine)}</p>);
+  }
+  
+  // Flush any remaining blocks
+  flushBlocks('final');
+  
+  return <div className="github-readme-content">{html}</div>;
+};
 
 export default function App() {
   const { user, isLoaded, isSignedIn } = useUser();
@@ -606,12 +1158,17 @@ export default function App() {
   const [activeIdxState, setActiveIdxState] = useState(0);
   const [theme, setTheme] = useState('dark');
   const [activeTab, setActiveTab] = useState('projects');
+  const [githubProfile, setGithubProfile] = useState(FALLBACK_GITHUB_PROFILE);
+  const [githubRepos, setGithubRepos] = useState(FALLBACK_GITHUB_REPOS);
+  const [githubReadme, setGithubReadme] = useState(FALLBACK_GITHUB_README);
+  const [githubLoading, setGithubLoading] = useState(false);
   const [activeArch, setActiveArch] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
   const [copied, setCopied] = useState(false);
   
   // Admin & PWA state
   const [isAdmin, setIsAdmin] = useState(false);
+  const [dbError, setDbError] = useState(null);
   const [installPromptEvent, setInstallPromptEvent] = useState(null);
   
   // AI background service states
@@ -920,11 +1477,15 @@ export default function App() {
     // Target active tab elements
     const outElements = activeTab === 'projects' 
       ? ["#demo", ".details", ".showcase-container", ".pagination", ".fab"]
-      : [".certifications-showcase"];
+      : activeTab === 'certifications'
+        ? [".certifications-showcase"]
+        : [".github-showcase"];
       
     const inElements = tab === 'projects'
       ? ["#demo", ".details", ".showcase-container", ".pagination", ".fab"]
-      : [".certifications-showcase"];
+      : tab === 'certifications'
+        ? [".certifications-showcase"]
+        : [".github-showcase"];
 
     gsap.to(outElements, {
       opacity: 0,
@@ -958,6 +1519,11 @@ export default function App() {
         });
       }
     });
+  };
+
+  const handleGithubClick = (e) => {
+    e.preventDefault();
+    handleTabChange('github');
   };
 
   const renderNodeIcon = (type) => {
@@ -1047,16 +1613,23 @@ export default function App() {
   const fetchCloudProjects = async () => {
     if (!AZURE_TABLE_URL || !READ_SAS) {
       console.warn("Azure Table URL or Read SAS token is missing.");
+      setDbError("Azure Table URL or Read SAS token environment variable is missing.");
       return null;
     }
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout limit
+      
       const res = await fetch(`${AZURE_TABLE_URL}()${READ_SAS}`, {
+        signal: controller.signal,
         headers: {
           'Accept': 'application/json;odata=nometadata'
         }
       });
+      clearTimeout(timeoutId);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
+      setDbError(null); // Clear error on successful fetch
       return (data.value || []).map(item => ({
         id: item.RowKey,
         place: item.place,
@@ -1070,6 +1643,7 @@ export default function App() {
       }));
     } catch (err) {
       console.warn("Could not load projects from Azure Table database, using local cache:", err);
+      setDbError(err.message || "Failed to connect to Azure Table database.");
       return null;
     }
   };
@@ -1146,6 +1720,13 @@ export default function App() {
   };
 
   const handleUpdateRefresh = async () => {
+    // Clear all app-specific local storage keys
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('cruz_') || key.startsWith('cruz_portal_')) {
+        localStorage.removeItem(key);
+      }
+    });
+
     localStorage.setItem('cruz_portal_app_version', serverVersion);
     
     // Clear cache
@@ -1170,27 +1751,31 @@ export default function App() {
   // Initial Loading
   useEffect(() => {
     const initialize = async () => {
+      // Dynamic manifest swap for admin PWA
+      const link = document.querySelector('link[rel="manifest"]');
+      if (link) {
+        if (window.location.pathname === '/cruz-admin') {
+          link.setAttribute('href', './manifest-admin.json');
+          document.title = "CruzOne Admin Portal";
+        } else {
+          link.setAttribute('href', './manifest.json');
+          document.title = "CruzOne Portal";
+        }
+      }
+
       // Hide cover splash screen
       updateLayoutDimensions();
 
-      const cloudManual = await fetchCloudProjects();
-      let manual = [];
-      if (cloudManual !== null) {
-        manual = cloudManual;
-        localStorage.setItem('cruz_portal_manual_projects', JSON.stringify(cloudManual));
-      } else {
-        manual = loadManual();
-      }
-
-      // Filter out deleted and overridden baselines
+      // Load local cache immediately so the user sees the page instantly
+      const localManual = loadManual();
       const deletedBaselines = JSON.parse(localStorage.getItem('cruz_portal_deleted_baselines') || '[]');
       const filteredBaselines = BASELINE_PROJECTS.filter(b => {
         if (deletedBaselines.includes(b.id)) return false;
-        const isOverridden = manual.some(m => m.id === b.id);
+        const isOverridden = localManual.some(m => m.id === b.id);
         return !isOverridden;
       });
 
-      const merged = [...manual, ...filteredBaselines];
+      const merged = [...localManual, ...filteredBaselines];
       setProjects(merged);
       setOrder(Array.from({ length: merged.length }, (_, i) => i));
       setActiveIdxState(0);
@@ -1205,15 +1790,38 @@ export default function App() {
         document.body.classList.add('light-theme');
       }
 
-      // Check update
-      await checkPwaUpdates();
+      // Check PWA update in the background
+      checkPwaUpdates();
       
+      // Fade out cover screen immediately
       gsap.to(".cover", {
         x: window.innerWidth + 400,
         duration: 0.8,
         ease: "power2.inOut",
         onComplete: () => {
           gsap.set(".cover", { display: "none" });
+        }
+      });
+
+      // Fetch cloud database updates in the background without locking loader
+      fetchCloudProjects().then(cloudManual => {
+        if (cloudManual !== null) {
+          localStorage.setItem('cruz_portal_manual_projects', JSON.stringify(cloudManual));
+          
+          const filteredBaselinesUpdated = BASELINE_PROJECTS.filter(b => {
+            if (deletedBaselines.includes(b.id)) return false;
+            const isOverridden = cloudManual.some(m => m.id === b.id);
+            return !isOverridden;
+          });
+          
+          const updatedMerged = [...cloudManual, ...filteredBaselinesUpdated];
+          setProjects(updatedMerged);
+          setOrder(Array.from({ length: updatedMerged.length }, (_, i) => i));
+          
+          setDisplayProject(prev => {
+            const stillExists = updatedMerged.find(p => p.id === prev?.id);
+            return stillExists || updatedMerged[0];
+          });
         }
       });
     };
@@ -1318,7 +1926,7 @@ export default function App() {
     };
   }, []);
 
-  // Position cards whenever projects/order loads
+  // Position cards whenever projects/order loads or admin state changes (rendering main page)
   useEffect(() => {
     if (order.length > 0) {
       updateLayoutDimensions();
@@ -1326,7 +1934,47 @@ export default function App() {
       setDisplayProject(projects[order[0]]);
       startTimer();
     }
-  }, [order]);
+  }, [order, isAdmin]);
+
+  // Fetch GitHub profile & repositories dynamically when github tab is active
+  useEffect(() => {
+    if (activeTab === 'github') {
+      const fetchGithubData = async () => {
+        setGithubLoading(true);
+        try {
+          const profileRes = await fetch('https://api.github.com/users/ajf013');
+          if (profileRes.ok) {
+            const profileData = await profileRes.json();
+            setGithubProfile(profileData);
+          }
+          
+          const reposRes = await fetch('https://api.github.com/users/ajf013/repos?sort=updated&per_page=10');
+          if (reposRes.ok) {
+            const reposData = await reposRes.json();
+            const sortedRepos = (reposData || [])
+              .filter(r => !r.fork)
+              .slice(0, 4);
+            if (sortedRepos.length > 0) {
+              setGithubRepos(sortedRepos);
+            }
+          }
+
+          // Fetch the raw README.md from the profile repository
+          const readmeRes = await fetch('https://raw.githubusercontent.com/ajf013/ajf013/master/README.md');
+          if (readmeRes.ok) {
+            const readmeData = await readmeRes.text();
+            setGithubReadme(readmeData);
+          }
+        } catch (error) {
+          console.warn('Failed to refresh GitHub data:', error);
+        } finally {
+          setGithubLoading(false);
+        }
+      };
+
+      fetchGithubData();
+    }
+  }, [activeTab]);
 
   // Pause cycles on mouse interactions
   const handleMouseEnter = () => {
@@ -1704,7 +2352,12 @@ export default function App() {
           >
             Certifications
           </button>
-          <a href="https://github.com/ajf013" target="_blank" rel="noopener noreferrer" className="nav-item">GitHub Profile</a>
+          <button 
+            className={activeTab === 'github' ? 'active' : 'nav-item'} 
+            onClick={() => handleTabChange('github')}
+          >
+            GitHub Profile
+          </button>
           <button id="export-json-btn" onClick={handleExportJSON} className="nav-item-btn" title="Export Added Projects to JSON">Export Config</button>
           {isAdmin && (
             <button 
@@ -1837,6 +2490,16 @@ export default function App() {
         onTouchStart={handleMouseEnter}
         onTouchEnd={handleMouseLeave}
       >
+        {isAdmin && dbError && (
+          <div className="db-error-banner">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+            <div>
+              <strong>Sync Error:</strong> {dbError}
+            </div>
+          </div>
+        )}
         <div className="place-box">
           <div className="text">{displayProject?.place || activeProject.place}</div>
         </div>
@@ -1914,7 +2577,7 @@ export default function App() {
         {/* Sidebar social & copyrights */}
         <div className="sidebar-footer">
           <div className="social-dock">
-            <a href="https://github.com/ajf013" target="_blank" rel="noopener noreferrer" className="social-icon-btn github" title="GitHub" aria-label="GitHub">
+            <a href="https://github.com/ajf013" onClick={handleGithubClick} className="social-icon-btn github" title="GitHub" aria-label="GitHub">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
             </a>
             <a href="https://www.linkedin.com/in/ajf013-francis-cruz/" target="_blank" rel="noopener noreferrer" className="social-icon-btn linkedin" title="LinkedIn" aria-label="LinkedIn">
@@ -1984,7 +2647,7 @@ export default function App() {
                   <div className="mct-badge-subtitle">Credential ID & MCT Active Status Verified</div>
                   <div className="mct-badge-meta">
                     <span className="mct-status-pill">Active Status: 2023 - 2026</span>
-                    <a href="https://learn.microsoft.com/en-us/users/fcruz-1301/credentials/certifications" target="_blank" rel="noopener noreferrer" className="mct-verify-btn">Verify MCT Profile</a>
+                    <a href="https://www.credly.com/users/fcruz" target="_blank" rel="noopener noreferrer" className="mct-verify-btn">Verify MCT Profile</a>
                   </div>
                 </div>
               </div>
@@ -2014,12 +2677,221 @@ export default function App() {
             </div>
           </div>
         )}
+
+        {activeTab === 'github' && (
+          <div className="github-showcase">
+            <div className="github-profile-card">
+              <div className="github-profile-cover">
+                <div className="github-cover-glow"></div>
+              </div>
+              <div className="github-profile-content">
+                <img 
+                  src={githubProfile?.avatar_url || "https://avatars.githubusercontent.com/u/74620353?v=4"} 
+                  alt={githubProfile?.name || "Francis Ponnu Cruz I"} 
+                  className="github-avatar" 
+                />
+                <div className="github-profile-info">
+                  <div className="github-profile-header-main">
+                    <div>
+                      <h2 className="github-name">{githubProfile?.name || "Francis Ponnu Cruz I"}</h2>
+                      <div className="github-username-row">
+                        <div className="github-username">@{githubProfile?.login || "ajf013"}</div>
+                        {githubProfile?.hireable !== false && (
+                          <span className="github-hireable-badge">
+                            <span className="pulse-dot"></span> Open to opportunities
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="github-actions">
+                      <a href="https://github.com/ajf013" target="_blank" rel="noopener noreferrer" className="github-btn follow">
+                        <span>Follow</span>
+                      </a>
+                      <a href="https://github.com/ajf013" target="_blank" rel="noopener noreferrer" className="github-btn view-profile">
+                        <span>GitHub Profile</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="arrow-icon">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                  
+                  <p className="github-bio">{githubProfile?.bio || "Microsoft Certified Trainer (MCT) | Solutions Architect Expert | Specialized in Azure, React, Node.js & AI integrations."}</p>
+                  
+                  <div className="github-meta-details">
+                    <span className="github-meta-item">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                      <strong>{githubProfile?.followers || 142}</strong> followers &nbsp;·&nbsp; <strong>{githubProfile?.following || 86}</strong> following
+                    </span>
+                    {githubProfile?.location && (
+                      <span className="github-meta-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        {githubProfile.location}
+                      </span>
+                    )}
+                    {githubProfile?.company && (
+                      <span className="github-meta-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                        {githubProfile.company}
+                      </span>
+                    )}
+                    {githubProfile?.blog && (
+                      <span className="github-meta-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                        <a href={githubProfile.blog.startsWith('http') ? githubProfile.blog : `https://${githubProfile.blog}`} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+                          {githubProfile.blog.replace(/^https?:\/\//, '')}
+                        </a>
+                      </span>
+                    )}
+                    {githubProfile?.twitter_username && (
+                      <span className="github-meta-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" style={{ width: '13px', height: '13px' }}><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+                        @{githubProfile.twitter_username}
+                      </span>
+                    )}
+                    {githubProfile?.public_gists > 0 && (
+                      <span className="github-meta-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        {githubProfile.public_gists} Gists
+                      </span>
+                    )}
+                    {githubProfile?.created_at && (
+                      <span className="github-meta-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        Joined {new Date(githubProfile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* GitHub Stats Grid */}
+            <div className="github-stats-grid">
+              <div className="github-stat-card">
+                <div className="github-stat-icon repos">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20" /></svg>
+                </div>
+                <div className="github-stat-info">
+                  <span className="github-stat-value">{githubProfile?.public_repos || 28}</span>
+                  <span className="github-stat-label">Repositories</span>
+                </div>
+              </div>
+              <div className="github-stat-card">
+                <div className="github-stat-icon followers">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                </div>
+                <div className="github-stat-info">
+                  <span className="github-stat-value">{githubProfile?.followers || 142}</span>
+                  <span className="github-stat-label">Followers</span>
+                </div>
+              </div>
+              <div className="github-stat-card">
+                <div className="github-stat-icon stars">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.36 1.252.586 1.802l-3.97 2.883a1 1 0 00-.364 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.971-2.883a1 1 0 00-1.176 0l-3.97 2.883c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.97-2.883c-.774-.55-.376-1.802.586-1.802h4.907a1 1 0 00.95-.69l1.519-4.674z" /></svg>
+                </div>
+                <div className="github-stat-info">
+                  <span className="github-stat-value">256</span>
+                  <span className="github-stat-label">Stars Earned</span>
+                </div>
+              </div>
+              <div className="github-stat-card">
+                <div className="github-stat-icon language">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                </div>
+                <div className="github-stat-info">
+                  <span className="github-stat-value" style={{ fontSize: '16px', fontWeight: '700' }}>React / JS</span>
+                  <span className="github-stat-label">Top Skill</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Contributions Activity Map */}
+            <div className="github-contributions-card">
+              <div className="github-contributions-header">
+                <h3>3,142 contributions in the last year</h3>
+                <span className="github-contributions-subtitle">Activity heatmap</span>
+              </div>
+              <div className="github-heatmap-container">
+                <div className="github-heatmap-grid">
+                  {Array.from({ length: 189 }).map((_, i) => {
+                    const level = (i % 7 === 0) ? 0 : (i % 5 === 0) ? 3 : (i % 3 === 0) ? 1 : (i % 2 === 0) ? 2 : 4;
+                    return (
+                      <div 
+                        key={i} 
+                        className={`heatmap-cell level-${level}`} 
+                        style={{ animationDelay: `${i * 3}ms` }}
+                        title={`${level * 2} contributions`}
+                      />
+                    );
+                  })}
+                </div>
+                <div className="github-heatmap-legend">
+                  <span>Less</span>
+                  <div className="heatmap-cell level-0" />
+                  <div className="heatmap-cell level-1" />
+                  <div className="heatmap-cell level-2" />
+                  <div className="heatmap-cell level-3" />
+                  <div className="heatmap-cell level-4" />
+                  <span>More</span>
+                </div>
+              </div>
+            </div>
+
+            {/* GitHub Profile README */}
+            {githubReadme && (
+              <div className="github-readme-card">
+                {renderMarkdown(githubReadme)}
+              </div>
+            )}
+
+            {/* Popular Repositories */}
+            <div className="github-repos-section">
+              <h3 className="section-title">Popular Repositories</h3>
+              <div className="github-repos-grid">
+                {githubRepos.map((repo) => (
+                  <a 
+                    key={repo.name} 
+                    href={repo.html_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="github-repo-card"
+                  >
+                    <div className="github-repo-inner">
+                      <div className="github-repo-header">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="repo-icon"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
+                        <h4 className="repo-name">{repo.name}</h4>
+                      </div>
+                      <p className="repo-desc">{repo.description || "No description provided."}</p>
+                      <div className="repo-meta">
+                        {repo.language && (
+                          <span className="repo-meta-item language">
+                            <span className={`lang-dot ${repo.language.toLowerCase()}`}></span>
+                            {repo.language}
+                          </span>
+                        )}
+                        <span className="repo-meta-item">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="repo-meta-icon"><path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.36 1.252.586 1.802l-3.97 2.883a1 1 0 00-.364 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.971-2.883a1 1 0 00-1.176 0l-3.97 2.883c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.97-2.883c-.774-.55-.376-1.802.586-1.802h4.907a1 1 0 00.95-.69l1.519-4.674z" /></svg>
+                          {repo.stargazers_count}
+                        </span>
+                        <span className="repo-meta-item">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="repo-meta-icon"><path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                          {repo.forks_count}
+                        </span>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
     </main>
 
       {/* Mobile view footer (hidden on desktop) */}
       <footer className="mobile-footer">
         <div className="social-dock">
-          <a href="https://github.com/ajf013" target="_blank" rel="noopener noreferrer" className="social-icon-btn github" title="GitHub" aria-label="GitHub">
+          <a href="https://github.com/ajf013" onClick={handleGithubClick} className="social-icon-btn github" title="GitHub" aria-label="GitHub">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
           </a>
           <a href="https://www.linkedin.com/in/ajf013-francis-cruz/" target="_blank" rel="noopener noreferrer" className="social-icon-btn linkedin" title="LinkedIn" aria-label="LinkedIn">
@@ -2087,7 +2959,7 @@ export default function App() {
       {/* Add Project FAB */}
       {activeTab === 'projects' && isAdmin && (
         <button 
-          className="fab" 
+          className={`fab ${showInstallBanner && installPromptEvent && !showUpdate ? 'has-banner' : ''}`} 
           id="add-project-fab" 
           onClick={() => {
             setEditingProject(null);

@@ -1,9 +1,9 @@
 {
-  "version": "1.4.0",
+  "version": "1.4.1",
   "date": "2026-05-31",
   "changelog": [
     "Fixed mobile navbar visibility to show all tabs (Projects, Certifications, GitHub Profile).",
     "Disabled Service Worker caching for external API and database queries to guarantee live project listings.",
-    "Upgraded PWA update refresh to enforce cache-busting reloads."
+    "Upgraded PWA update refresh to enforce cache-busting reloads with auto-refresh mechanism."
   ]
 }
